@@ -153,7 +153,7 @@
     <section class="gallery">
         <h2>Hayakawa Electronics (Phils.) Corps.</h2>
         <div class="container mt-4">
-            <a href = "wi.php" style = "text-decoration: none; color:white;">
+            <a href = "fm.php?page=wi" style = "text-decoration: none; color:white;">
             <div class="row row-cols-3 row-cols-md-3 g-3">
                 <div class="col-sm">
                     <div class="card">
@@ -165,7 +165,8 @@
                     </div>
                 </div>
             </a>
-                <div class="col-sm">
+            <a  href = "fm.php?page=cp" style = "text-decoration: none; color:white;">
+            <div class="col-sm">
                     <div class="card">
                         <img src="crap.jpg" class="card-img-top" alt="Artwork 3">
                         <div class="card-body">
@@ -174,15 +175,20 @@
                         </div>
                     </div>
                 </div>
+            
+            </a>
+            <a  href = "fm.php?page=fic" style = "text-decoration: none; color:white;">
                 <div class="col-sm">
                     <div class="card">
                         <img src="crap.jpg" class="card-img-top" alt="Artwork 4">
                         <div class="card-body">
                             <h5 class="card-title">FIC</h5>
-                          
+            
                         </div>
                     </div>
                 </div>
+            </a>
+            <a  href = "fm.php?page=ps" style = "text-decoration: none; color:white;">
                 <div class="col-sm">
                     <div class="card">
                         <img src="crap.jpg" class="card-img-top" alt="Artwork 5">
@@ -192,6 +198,8 @@
                         </div>
                     </div>
                 </div>
+                </a>
+                <a  href = "fm.php?page=md" style = "text-decoration: none; color:white;">
                 <div class="col-sm">
                     <div class="card">
                         <img src="crap.jpg" class="card-img-top" alt="Artwork 6">
@@ -201,6 +209,8 @@
                         </div>
                     </div>
                 </div>
+                </a>
+                <a  href = "fm.php?page=diaor" style = "text-decoration: none; color:white;">
                 <div class="col-sm">
                     <div class="card">
                         <img src="crap.jpg" class="card-img-top" alt="Artwork 6">
@@ -210,6 +220,8 @@
                         </div>
                     </div>
                 </div>
+                </a>
+                <a  href = "fm.php?page=dmc" style = "text-decoration: none; color:white;">
                 <div class="col-sm">
                     <div class="card">
                         <img src="crap.jpg" class="card-img-top" alt="Artwork 6">
@@ -219,6 +231,8 @@
                         </div>
                     </div>
                 </div>
+                </a>
+                <a  href = "fm.php?page=par" style = "text-decoration: none; color:white;">
                 <div class="col-sm">
                     <div class="card">
                         <img src="crap.jpg" class="card-img-top" alt="Artwork 6">
@@ -228,6 +242,8 @@
                         </div>
                     </div>
                 </div>
+                </a>
+                <a  href = "fm.php?page=dcior" style = "text-decoration: none; color:white;">
                 <div class="col-sm">
                     <div class="card">
                         <img src="crap.jpg" class="card-img-top" alt="Artwork 6">
@@ -237,6 +253,7 @@
                         </div>
                     </div>
                 </div>
+                </a>
             </div>
         </div>
     </section>

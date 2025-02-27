@@ -1,7 +1,7 @@
 <?php
 $user="root";
 $pass="";
-$db="engrdgtz";
+$db="dgtz";
 $conn="";
 
 try{
