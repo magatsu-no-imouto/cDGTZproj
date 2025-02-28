@@ -31,7 +31,7 @@
         <br>
         <?php 
         $file=$_GET['filename'];
-        echo "<iframe src=\"files/$file.pdf\" style=\"height:90vh; width:100%; border:none;\"></iframe>";
+        echo "<iframe src=\"files/$page/$file.pdf\" style=\"height:90vh; width:100%; border:none;\"></iframe>";
 ?>
     </body>
 </html>

@@ -1,3 +1,6 @@
+<?php
+include("connecto.php");
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -147,13 +150,83 @@
         <i class="fas fa-sun"></i>
     </button>
 
-  
-
     <!-- Gallery Section -->
     <section class="gallery">
         <h2>Hayakawa Electronics (Phils.) Corps.</h2>
+        <form method="post">
+        <div class="row">
+            <div class="col">
+            <label for="divisionSelect" class="form-label" style= "font-weight: bold;">Division:</label>
+            <?php
+            $q=array();
+            $q1="";
+            $q2="";
+            $q3="";
+            if(!empty($_GET['q'])){
+                $q=json_decode(urldecode($_GET['q']), true);
+                if($q[0]!=""){
+                    $q1=$q[0];
+                }
+                if($q[1]!=""){
+                    $q2=$q[1];
+                }
+                if($q[2]!=""){
+                    $q3=$q[2];
+                }                
+            }
+            if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                $q1 = $_POST['division'] ?? "";
+                $q2 = $_POST['customer'] ?? "";
+                $q3 = $_POST['partNumber'] ?? "";
+            }
+            ?>
+            <select name='division' id='divisionSelect' class='form-select' onchange="filter()"><option></option>
+            <?php
+            $sql="SELECT divisionName FROM division";
+            $result=mysqli_query($conn,$sql);
+            while($row=mysqli_fetch_assoc($result)){
+                if($q1==$row['divisionName']){
+                    echo "<option value='" . $row['divisionName'] . "' selected >" . $row['divisionName'] . "</option>";
+                }else{
+                    echo "<option value='" . $row['divisionName'] . "'>" . $row['divisionName'] . "</option>";
+                }
+            }
+            echo "</select>";
+            ?>
+        </div>
+        
+        <div class="col">
+            <label for="customerSelect" class="form-label" style= "font-weight: bold;">Customer:</label>
+            <?php
+            echo "<select name='customer' id='customerSelect' class='form-select' onchange='filter()''><option></option>";
+            $sql="SELECT customerName FROM customer";
+            $result=mysqli_query($conn,$sql);
+            while($row=mysqli_fetch_assoc($result)){
+                if($q2==$row['customerName']){
+                    echo "<option value='" . $row['customerName'] . "' selected>" . $row['customerName'] . "</option>";
+                }else{
+                    echo "<option value='" . $row['customerName'] . "'>" . $row['customerName'] . "</option>";}    
+            }
+            echo "</select>";
+            ?>
+        </div>
+        <div class="col">
+            <label for="partNumberSelect" class="form-label" style= "font-weight: bold;">Part Number:</label>            
+            <?php
+            echo "<select name='partNumber' id='partNumberSelect' class='form-select' onchange='filter()'><option></option>";
+            $sql="SELECT partNo FROM parts";
+            $result=mysqli_query($conn,$sql);
+            while($row=mysqli_fetch_assoc($result)){
+                if($q3==$row['partNo']){
+                    echo "<option value='" . $row['partNo'] . "' selected >" . $row['partNo'] . "</option>";
+                }else{
+                    echo "<option value='" . $row['partNo'] . "'>" . $row['partNo'] . "</option>";}                
+            }
+            echo "</select>";
+            ?>
+        </div>
         <div class="container mt-4">
-            <a href = "fm.php?page=wi" style = "text-decoration: none; color:white;">
+            <a id="wi" name="links" href = "fm.php?page=wi" style = "text-decoration: none; color:white;">
             <div class="row row-cols-3 row-cols-md-3 g-3">
                 <div class="col-sm">
                     <div class="card">
@@ -165,7 +238,7 @@
                     </div>
                 </div>
             </a>
-            <a  href = "fm.php?page=cp" style = "text-decoration: none; color:white;">
+            <a name="links" id="cp" href = "fm.php?page=cp" style = "text-decoration: none; color:white;">
             <div class="col-sm">
                     <div class="card">
                         <img src="crap.jpg" class="card-img-top" alt="Artwork 3">
@@ -177,7 +250,7 @@
                 </div>
             
             </a>
-            <a  href = "fm.php?page=fic" style = "text-decoration: none; color:white;">
+            <a name="links" id="fic" href = "fm.php?page=fic" style = "text-decoration: none; color:white;">
                 <div class="col-sm">
                     <div class="card">
                         <img src="crap.jpg" class="card-img-top" alt="Artwork 4">
@@ -188,7 +261,7 @@
                     </div>
                 </div>
             </a>
-            <a  href = "fm.php?page=ps" style = "text-decoration: none; color:white;">
+            <a name="links" id="ps" href = "fm.php?page=ps" style = "text-decoration: none; color:white;">
                 <div class="col-sm">
                     <div class="card">
                         <img src="crap.jpg" class="card-img-top" alt="Artwork 5">
@@ -199,7 +272,7 @@
                     </div>
                 </div>
                 </a>
-                <a  href = "fm.php?page=md" style = "text-decoration: none; color:white;">
+            <a name="links" id="md" href = "fm.php?page=md" style = "text-decoration: none; color:white;">
                 <div class="col-sm">
                     <div class="card">
                         <img src="crap.jpg" class="card-img-top" alt="Artwork 6">
@@ -210,7 +283,7 @@
                     </div>
                 </div>
                 </a>
-                <a  href = "fm.php?page=diaor" style = "text-decoration: none; color:white;">
+            <a name="links" id="diaor" href = "fm.php?page=diaor" style = "text-decoration: none; color:white;">
                 <div class="col-sm">
                     <div class="card">
                         <img src="crap.jpg" class="card-img-top" alt="Artwork 6">
@@ -221,7 +294,7 @@
                     </div>
                 </div>
                 </a>
-                <a  href = "fm.php?page=dmc" style = "text-decoration: none; color:white;">
+            <a name="links" id="dmc" href = "fm.php?page=dmc" style = "text-decoration: none; color:white;">
                 <div class="col-sm">
                     <div class="card">
                         <img src="crap.jpg" class="card-img-top" alt="Artwork 6">
@@ -232,7 +305,7 @@
                     </div>
                 </div>
                 </a>
-                <a  href = "fm.php?page=par" style = "text-decoration: none; color:white;">
+            <a id="par" name="links" href = "fm.php?page=par" style = "text-decoration: none; color:white;">
                 <div class="col-sm">
                     <div class="card">
                         <img src="crap.jpg" class="card-img-top" alt="Artwork 6">
@@ -243,7 +316,7 @@
                     </div>
                 </div>
                 </a>
-                <a  href = "fm.php?page=dcior" style = "text-decoration: none; color:white;">
+            <a name="links" id="dcior" href = "fm.php?page=dcior" style = "text-decoration: none; color:white;">
                 <div class="col-sm">
                     <div class="card">
                         <img src="crap.jpg" class="card-img-top" alt="Artwork 6">
@@ -256,6 +329,9 @@
                 </a>
             </div>
         </div>
+        <div class="row mb-3">
+        
+        <button name="submit" class="btn btn-primary w-100" style= "font-weight: bold; background-color: rgb(140, 139, 137);" type="button" onclick="window.location.replace('fup.php')">upload file</button>
     </section>
 
     <!-- Footer Section -->
@@ -280,6 +356,20 @@
                 icon.classList.add('fa-sun');
             }
         });
+
+        function filter(){
+            var selA=document.getElementById('divisionSelect').value;
+            var selB=document.getElementById('customerSelect').value
+            var selC=document.getElementById('partNumberSelect').value;
+            const stuff = document.querySelectorAll(`[name="links"]`);
+            var selArr=[selA,selB,selC]
+            var qSel=encodeURIComponent(JSON.stringify(selArr))
+            stuff.forEach(item=>{
+                item.href="fm.php?page="+item.id+"&q="+qSel;
+            })
+            
+            
+        }
     </script>
 </body>
 

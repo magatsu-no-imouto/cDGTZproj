@@ -47,7 +47,7 @@ include("connecto.php");
     ?>
     <!-- Search Filters -->
     <div class="row mb-3">
-        <form method="post">
+        <form id="fomm" method="post">
         <div class="row">
             <div class="col">
             <label for="divisionSelect" class="form-label" style= "font-weight: bold;">Division:</label>
@@ -56,8 +56,12 @@ include("connecto.php");
             $q1="";
             $q2="";
             $q3="";
-            if(!empty($_GET['q'])){
+            $q4="";
+            if(isset($_GET['q'])){
                 $q=json_decode(urldecode($_GET['q']), true);
+            }
+            if(!empty($q)){
+                
                 if($q[0]!=""){
                     $q1=$q[0];
                 }
@@ -66,14 +70,20 @@ include("connecto.php");
                 }
                 if($q[2]!=""){
                     $q3=$q[2];
-                }                
+                }
+                if($q[3]!=""){
+                    $q4=$q[3];
+                }
             }
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $q1 = $_POST['division'] ?? "";
                 $q2 = $_POST['customer'] ?? "";
                 $q3 = $_POST['partNumber'] ?? "";
+                $q4 = $_POST['itemKey'] ?? "";
             }
+
             ?>
+
             <select name='division' id='divisionSelect' class='form-select'><option></option>
             <?php
             $sql="SELECT divisionName FROM division";
@@ -118,7 +128,16 @@ include("connecto.php");
             }
             echo "</select>";
             ?>
-            
+        </div>
+        <div class="col">
+            <label for="itemKey" class="form-label" style= "font-weight: bold;">Item Key:</label>
+            <?php
+            if($q4!=""){
+                echo "<input id='itemKey' name='itemKey' class='form-control' value='$q4'>";
+            }else{
+                echo "<input id='itemKey' name='itemKey' class='form-control'>";
+            }
+            ?>
         </div>
     </div>
         <div class="col-md-3 d-flex justify-content-center">
@@ -136,27 +155,47 @@ include("connecto.php");
     //of the SQL
 if(isset($_POST['submit'])){
     $find="";
+    $empy=1;
     if($_POST['division'] != ""){
-        $find.="division='".$_POST['division']."'";
+        $find.="WHERE division='".$_POST['division']."'";
+        $empy=0;
     }
     //if value is NOT the first, it adds the AND before the variable
     if($_POST['customer'] != "" && $find==""){
-        $find.="customer='".$_POST['customer']."'";
+        $find.="WHERE customer='".$_POST['customer']."'";
+        $empy=0;
     }else if($_POST['customer'] != ""){
         $find.=" AND customer='".$_POST['customer']."'";
+        $empy=0;
     }
     
     if($_POST['partNumber'] != ""  && $find==""){
-        $find.="partNo='".$_POST['partNumber']."'";
+        $find.="WHERE partNo='".$_POST['partNumber']."'";
+        $empy=0;
     }else if($_POST['partNumber'] != ""){
         $find.=" AND partNo='".$_POST['partNumber']."'";
+        $empy=0;
+    }
+    if($_POST['itemKey']!="" && $find==""){
+        $find.="WHERE itemKey LIKE '%".$_POST['itemKey']."%'";
+        $empy=0;
+    }else if($_POST['itemKey']!=""){
+        $find.=" AND itemKey LIKE '%".$_POST['itemKey']."%'";
+        $empy=0;
     }
     $q[0]=$_POST['division'];
     $q[1]=$_POST['customer'];
     $q[2]=$_POST['partNumber'];
+    $q[3]=$_POST['itemKey'];
+
+    $filterQ="WHERE fileType='$page'";
+    if($empy==0){
+        $filterQ="AND fileType='$page'";
+        
+    }
     
     //sql query is built and php constructs the html elements
-    $sql="SELECT * FROM files WHERE ".$find." AND fileType='".$page."'";
+    $sql="SELECT * FROM files $find $filterQ";
     $result=mysqli_query($conn,$sql);
     if($result){
         $noRows=mysqli_num_rows($result);
@@ -183,10 +222,37 @@ if(isset($_POST['submit'])){
         echo "<p class=\"mb-3 text-center py-3\" style=\"background-color: rgb(105, 105, 105); border-radius: 20px; margin-top: 20px;\">No results found.</p>";
     }
 } else {
-    echo "<p class=\"mb-3 text-center py-3\" style=\"background-color: rgb(105, 105, 105); border-radius: 20px; margin-top: 20px;\">Select filters and click 'Search' to view files.</p>";
+    $sql="SELECT * FROM files WHERE fileType='$page'";
+    $result=mysqli_query($conn,$sql);
+    if($result){
+        if($result){
+            $noRows=mysqli_num_rows($result);
+            if($noRows>=1){
+                echo "<div class=\"mb-3 text-center py-3\" style=\"background-color: rgb(105, 105, 105); border-radius: 20px; margin-top: 20px;\">";
+                echo "<table class='text-center mx-auto w-auto' style='background-color: rgb(105, 105, 105)'>";
+            echo "<thead><tr><th colspan=".$noRows.">Files</th></tr></thead>";
+            echo "<tbody>";
+            echo "<tr>";
+            echo "</div>";
+            while($row = mysqli_fetch_array($result)){
+    
+                echo "<td><img width='100px' style='margin: auto;' src="."'crap.jpg'"." onclick=\"showFile('".$row['fileName']."-".$page."')\" /><br>
+                ".$row['fileName']."
+                </td>";
+            }   
+            echo "</tr>";
+            echo "</tbody>";
+            echo "</table>";
+            }else{
+                echo "<p class=\"mb-3 text-center py-3\" style=\"background-color: rgb(105, 105, 105); border-radius: 20px; margin-top: 20px;\">No results found.</p>";
+            }   
+        }else{
+            echo "<p class=\"mb-3 text-center py-3\" style=\"background-color: rgb(105, 105, 105); border-radius: 20px; margin-top: 20px;\">No results found.</p>";
+        }
+    }
 }
 ?>
-
+</div>
 <div id="fileContainer" class="text-center mt-4">
     <iframe id="fileIframe" style="display:none" width="100%" height="500px"></iframe>
 </div>
@@ -203,9 +269,13 @@ if(isset($_POST['submit'])){
         var qE = encodeURIComponent(JSON.stringify(q));
         window.location.replace(`found.php?filename=${filename}&rtrn=${page2}&page=${page}&q=${qE}`)
 }
+
+    
+
     function redirectHub(){
         window.location.replace('centralHub.php')
     }
+
     </script>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
