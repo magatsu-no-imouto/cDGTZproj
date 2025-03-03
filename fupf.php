@@ -13,12 +13,15 @@ $customer=$_POST['customer'];
 $custShort="";
 $division=$_POST['division'];
 $partNo=$_POST['partNumber'];
+$lNo=$_POST['lineNo'];
+$lLead=$_POST['lineLead'];
 $itemKey=$_POST['itemKey'];
 $date=date('m/d/Y');
 
 $sqla="SELECT * FROM customer";
 $sqlb="SELECT divisionName FROM division";
 $sqlc="SELECT partNo FROM parts";
+$sqld="SELECT * FROM lineleaders";
 
 $finda=mysqli_query($conn,$sqla);
 $countA=0;
@@ -81,10 +84,30 @@ if($countC>1){
         echo "<p>Parts database error</p>";
     }
 }
+
+$findd=mysqli_query($conn,$sqld);
+$countD=0;
+while($row=mysqli_fetch_assoc($findd)){
+    if($lLead==$row['lLead']){
+        $countD=0;
+        break;
+    }
+    $countD+=1;
+}
+if($countD>=1){
+    $sqldd="INSERT INTO `lineleaders`(`lNo`,`lLead`,`dateAdded`) VALUES('$lNo','$lLead','$date')";
+    $sqldf=mysqli_query($conn,$sqldd);
+    if($sqldf){
+        echo "<p>Line Leader database updated</p>";
+    }else{
+        echo "<p>Line Leader database error</p>";
+    }
+}
+
 $fileName="f-".$custShort."-".$partNo."".$itemKey;
 
 $sql = "INSERT INTO `files` (`division`, `customer`, `partNo`, `itemKey`, `lineNo`, `lineLeader`, `fileName`, `filetype`) 
-        VALUES ('$division', '$customer', '$partNo', '$itemKey','', '', '$fileName', '$fileType')";
+        VALUES ('$division', '$customer', '$partNo', '$itemKey','$lNo', '$lLead', '$fileName', '$fileType')";
 
 $result = mysqli_query($conn, $sql);
 if($result){

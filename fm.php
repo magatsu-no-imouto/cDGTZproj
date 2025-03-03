@@ -57,11 +57,12 @@ include("connecto.php");
             $q2="";
             $q3="";
             $q4="";
+            $q5="";
+            $q6="";
             if(isset($_GET['q'])){
                 $q=json_decode(urldecode($_GET['q']), true);
             }
             if(!empty($q)){
-                
                 if($q[0]!=""){
                     $q1=$q[0];
                 }
@@ -74,13 +75,22 @@ include("connecto.php");
                 if($q[3]!=""){
                     $q4=$q[3];
                 }
+                if($q[4]!=""){
+                    $q5=$q[4];
+                }
+                if($q[5]!=""){
+                    $q6=$q[5];
+                }
             }
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $q1 = $_POST['division'] ?? "";
                 $q2 = $_POST['customer'] ?? "";
                 $q3 = $_POST['partNumber'] ?? "";
                 $q4 = $_POST['itemKey'] ?? "";
+                $q5 = $_POST['lNo']?? "";
+                $q6 = $_POST['lLead']?? "";
             }
+
 
             ?>
 
@@ -115,7 +125,7 @@ include("connecto.php");
             ?>
         </div>
         <div class="col">
-            <label for="partNumberSelect" class="form-label" style= "font-weight: bold;">Part Number:</label>            
+            <label for="partNumberSelect" class="form-label" style= "font-weight: bold;">Part No:</label>            
             <?php
             echo "<select name='partNumber' id='partNumberSelect' class='form-select'><option></option>";
             $sql="SELECT partNo FROM parts";
@@ -129,13 +139,43 @@ include("connecto.php");
             echo "</select>";
             ?>
         </div>
+        <div id="divLNo" class="col">
+            <label for="lineNoSelect" class="form-label" style= "font-weight: bold;">Line No:</label>            
+            <?php
+            echo "<select name='lineNo' id='lineNoSelect' class='form-select' onchange='selLLead()'><option></option>";
+            $sql="SELECT lNo, COUNT(lNo) AS frequency FROM `lineleaders` GROUP BY lNo ORDER BY `lineleaders`.`lNo` ASC;";
+            $result=mysqli_query($conn,$sql);
+            while($row=mysqli_fetch_assoc($result)){
+                if($q5==$row['lNo']){
+                    echo "<option value='" . $row['lNo'] . "' selected >" . $row['lNo'] . "</option>";
+                }else{
+                    echo "<option value='" . $row['lNo'] . "'>" . $row['lNo'] . "</option>";}                
+            }
+            echo "</select>";
+            ?>
+        </div>
+        <div id="divLLead" class="col">
+        <label for="lineLeadSelect" class="form-label" style= "font-size:10px;font-weight: bold;">Line Leader:</label>            
+            <?php
+            echo "<select name='lineLead' id='lineLeadSelect' class='form-select' onchange='selLNoSel()'><option></option>";
+            $sql="SELECT lLead FROM lineLeaders";
+            $result=mysqli_query($conn,$sql);
+            while($row=mysqli_fetch_assoc($result)){
+                if($q6==$row['lLead']){
+                    echo "<option value='" . $row['lLead'] . "' selected >" . $row['lLead'] . "</option>";
+                }else{
+                    echo "<option value='" . $row['lLead'] . "'>" . $row['lLead'] . "</option>";}                
+            }
+            echo "</select>";
+            ?>
+        </div>
         <div class="col">
-            <label for="itemKey" class="form-label" style= "font-weight: bold;">Item Key:</label>
+            <label for="itemKey" class="form-label" style= "font-size:12px;font-weight: bold;">Item Key:</label>
             <?php
             if($q4!=""){
-                echo "<input id='itemKey' name='itemKey' class='form-control' value='$q4'>";
+                echo "<input id='itemKey' name='itemKey' maxlength='6' oninput='formatIK(this)' value='$q4' class='form-control'>";
             }else{
-                echo "<input id='itemKey' name='itemKey' class='form-control'>";
+                echo "<input id='itemKey' name='itemKey' maxlength='6' oninput='formatIK(this)' class='form-control'>";
             }
             ?>
         </div>
@@ -183,10 +223,26 @@ if(isset($_POST['submit'])){
         $find.=" AND itemKey LIKE '%".$_POST['itemKey']."%'";
         $empy=0;
     }
+    if($_POST['lineNo']!="" && $find==""){
+        $find.="WHERE lineNo='".$_POST['lineNo']."'";
+        $empy=0;
+    }else if($_POST['lineNo']!=""){
+        $find.=" AND lineNo='".$_POST['lineNo']."'";
+        $empy=0;
+    }
+    if($_POST['lineLead']!="" && $find==""){
+        $find.="WHERE lineLeader='".$_POST['lineLead']."'";
+        $empy=0;
+    }else if($_POST['lineLead']!=""){
+        $find.=" AND lineleader='".$_POST['lineLead']."'";
+        $empy=0;
+    }
     $q[0]=$_POST['division'];
     $q[1]=$_POST['customer'];
     $q[2]=$_POST['partNumber'];
     $q[3]=$_POST['itemKey'];
+    $q[4]=$_POST['lineNo'];
+    $q[5]=$_POST['lineLead'];
 
     $filterQ="WHERE fileType='$page'";
     if($empy==0){
@@ -196,6 +252,7 @@ if(isset($_POST['submit'])){
     
     //sql query is built and php constructs the html elements
     $sql="SELECT * FROM files $find $filterQ";
+    
     $result=mysqli_query($conn,$sql);
     if($result){
         $noRows=mysqli_num_rows($result);
@@ -204,15 +261,22 @@ if(isset($_POST['submit'])){
             echo "<table class='text-center mx-auto w-auto' style='background-color: rgb(105, 105, 105)'>";
         echo "<thead><tr><th colspan=".$noRows.">Files</th></tr></thead>";
         echo "<tbody>";
-        echo "<tr>";
         echo "</div>";
+        $cellCount=1;
+        $lastR=mysqli_num_rows($result);
         while($row = mysqli_fetch_array($result)){
-
+            if($cellCount==0){
+                echo "<tr>";
+            }
             echo "<td><img width='100px' style='margin: auto;' src="."'crap.jpg'"." onclick=\"showFile('".$row['fileName']."-".$page."')\" /><br>
             ".$row['fileName']."
             </td>";
+            if($cellCount==4 || $cellCount==$lastR){
+                echo "</tr>";
+                $cellCount=0;
+            }
+            $cellCount+=1;
         }   
-        echo "</tr>";
         echo "</tbody>";
         echo "</table>";
         }else{
@@ -222,33 +286,95 @@ if(isset($_POST['submit'])){
         echo "<p class=\"mb-3 text-center py-3\" style=\"background-color: rgb(105, 105, 105); border-radius: 20px; margin-top: 20px;\">No results found.</p>";
     }
 } else {
-    $sql="SELECT * FROM files WHERE fileType='$page'";
+    $sql="";
+    if(!empty($q)){
+        $find="";
+        $empy=1;
+        if($q1!=""){
+            $find="WHERE division='".$q1."'";
+            $empy=0;
+        }
+        if($q2!="" && $find==""){
+            $find="WHERE customer='".$q2."'";
+            $empy=0;
+        }else if($q2!=""){
+            $find.=" AND customer='".$q2."'";
+            $empy=0;
+        }
+        if($q3!="" && $find==""){
+            $find="WHERE partNo='".$q3."'";
+            $empy=0;
+        }else if($q3!=""){
+            $find.=" AND partNo='".$q3."'";
+            $empy=0;
+        }
+        if($q4!="" && $find==""){
+            $find.="WHERE itemKey LIKE '%".$q4."%'";
+            $empy=0;
+        }else if($q4!=""){
+            $find.=" AND itemKey LIKE '%".$$q4."%'";
+            $empy=0;
+        }
+        if($q5!="" && $find==""){
+            $find="WHERE lineNo='".$q5."'";
+            $empy=0;
+        }else if($q5!=""){
+            $find.=" AND lineNo='".$q5."'";
+            $empy=0;
+        }
+        if($q6!="" && $find==""){
+            $find.="WHERE lineLeader='".$q6."'";
+            $empy=0;
+        }else if($q6!=""){
+            $find.=" AND lineleader='".$q6."'";
+            $empy=0;
+        }
+        $q[0]=$q1;
+        $q[1]=$q2;
+        $q[2]=$q3;
+        $q[3]=$q4;
+        $q[4]=$q5;
+        $q[5]=$q6;
+    
+        $filterQ="WHERE fileType='$page'";
+        if($empy==0){
+            $filterQ="AND fileType='$page'";
+        }
+        $sql="SELECT * FROM files $find $filterQ";
+    }else{
+        $sql="SELECT * FROM files WHERE fileType='$page'";
+    }
     $result=mysqli_query($conn,$sql);
     if($result){
-        if($result){
-            $noRows=mysqli_num_rows($result);
-            if($noRows>=1){
-                echo "<div class=\"mb-3 text-center py-3\" style=\"background-color: rgb(105, 105, 105); border-radius: 20px; margin-top: 20px;\">";
-                echo "<table class='text-center mx-auto w-auto' style='background-color: rgb(105, 105, 105)'>";
-            echo "<thead><tr><th colspan=".$noRows.">Files</th></tr></thead>";
-            echo "<tbody>";
-            echo "<tr>";
-            echo "</div>";
-            while($row = mysqli_fetch_array($result)){
-    
-                echo "<td><img width='100px' style='margin: auto;' src="."'crap.jpg'"." onclick=\"showFile('".$row['fileName']."-".$page."')\" /><br>
-                ".$row['fileName']."
-                </td>";
-            }   
-            echo "</tr>";
-            echo "</tbody>";
-            echo "</table>";
-            }else{
-                echo "<p class=\"mb-3 text-center py-3\" style=\"background-color: rgb(105, 105, 105); border-radius: 20px; margin-top: 20px;\">No results found.</p>";
-            }   
+        $noRows=mysqli_num_rows($result);
+        if($noRows>=1){
+            echo "<div class=\"mb-3 text-center py-3\" style=\"background-color: rgb(105, 105, 105); border-radius: 20px; margin-top: 20px;\">";
+            echo "<table class='text-center mx-auto w-auto' style='background-color: rgb(105, 105, 105)'>";
+        echo "<thead><tr><th colspan=".$noRows.">Files</th></tr></thead>";
+        echo "<tbody>";
+        echo "</div>";
+        $cellCount=1;
+        $lastR=mysqli_num_rows($result);
+        while($row = mysqli_fetch_array($result)){
+            if($cellCount==0){
+                echo "<tr>";
+            }
+            echo "<td><img width='100px' style='margin: auto;' src="."'crap.jpg'"." onclick=\"showFile('".$row['fileName']."-".$page."')\" /><br>
+            ".$row['fileName']."
+            </td>";
+            if($cellCount==4 || $cellCount==$lastR){
+                echo "</tr>";
+                $cellCount=0;
+            }
+            $cellCount+=1;
+        }   
+        echo "</tbody>";
+        echo "</table>";
         }else{
             echo "<p class=\"mb-3 text-center py-3\" style=\"background-color: rgb(105, 105, 105); border-radius: 20px; margin-top: 20px;\">No results found.</p>";
-        }
+        }   
+    }else{
+        echo "<p class=\"mb-3 text-center py-3\" style=\"background-color: rgb(105, 105, 105); border-radius: 20px; margin-top: 20px;\">No results found.</p>";
     }
 }
 ?>
@@ -267,7 +393,7 @@ if(isset($_POST['submit'])){
         ?>
 
         var qE = encodeURIComponent(JSON.stringify(q));
-        window.location.replace(`found.php?filename=${filename}&rtrn=${page2}&page=${page}&q=${qE}`)
+        window.location.replace(`found.php?filename=${filename}&rtrn=${page2}&page=${page}&q=${qE}`);
 }
 
     
@@ -276,6 +402,60 @@ if(isset($_POST['submit'])){
         window.location.replace('centralHub.php')
     }
 
+    function formatIK(input) {
+    let value = input.value; 
+    if (value.length > 4) {
+        input.value = value.slice(0, 4) + '-' + value.slice(4);
+    }
+}
+
+function selLLead(){
+    let lNo=document.getElementById('lineNoSelect').value;
+    let lLeadSel=document.getElementById('lineLeadSelect');
+
+
+    let xhr=new XMLHttpRequest();
+    xhr.open("GET","fetchlldrs.php?lNo="+encodeURIComponent(lNo),true);
+    xhr.onload=function(){
+        if(this.status===200){
+            let data = JSON.parse(this.responseText);
+            lLeadSel.innerHTML = "<option></option>";  // Reset dropdown
+            data.forEach(function(leader) {
+                let option = document.createElement("option");
+                option.value = leader;
+                option.textContent = leader;
+                lLeadSel.appendChild(option);
+            });
+        }
+    }
+    xhr.send();
+}
+
+function selLNoSel() {
+    let lLead = document.getElementById('lineLeadSelect').value;  // Get selected Line Leader
+    let lNoSelect = document.getElementById('lineNoSelect');      // Get Line Number dropdown
+
+    if (lLead === "") {
+        lNoSelect.value = ""; 
+        // Reset dropdown if no Line Leader is selected
+        return;
+    }
+
+    let xhr = new XMLHttpRequest();
+    xhr.open("GET", "fetchlNo.php?lLead=" + encodeURIComponent(lLead), true);
+    xhr.onload = function () {
+        if (this.status === 200) {
+            let data = JSON.parse(this.responseText);
+            
+            if (data.length > 0) {
+                // Auto-select the first Line Number if available
+                lNoSelect.value = data[0];
+                
+            }
+        }
+    };
+    xhr.send();
+}
     </script>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

@@ -51,6 +51,7 @@ include("connecto.php");
         }
 
         .gallery .card {
+            color: rgb(180, 180, 0);
             border: none;
             border-radius: 12px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
@@ -63,6 +64,7 @@ include("connecto.php");
         }
 
         .gallery .card-img-top {
+            
             height: 100px;
             width: 100%;
             object-fit: cover;
@@ -127,7 +129,8 @@ include("connecto.php");
             position: fixed;
             top: 20px;
             right: 20px;
-            background-color: #f1f1f1;
+            background-color:rgb(255, 255, 255);
+            color:black;
             border: none;
             padding: 10px;
             border-radius: 50%;
@@ -211,7 +214,7 @@ include("connecto.php");
             ?>
         </div>
         <div class="col">
-            <label for="partNumberSelect" class="form-label" style= "font-weight: bold;">Part Number:</label>            
+            <label for="partNumberSelect" class="form-label" style= "font-weight: bold;">Part No:</label>            
             <?php
             echo "<select name='partNumber' id='partNumberSelect' class='form-select' onchange='filter()'><option></option>";
             $sql="SELECT partNo FROM parts";
@@ -224,6 +227,40 @@ include("connecto.php");
             }
             echo "</select>";
             ?>
+        </div>
+        <div id="divLNo" class="col">
+            <label for="lineNoSelect" class="form-label" style= "font-weight: bold;">Line No:</label>            
+            <?php
+            echo "<select name='lineNo' id='lineNoSelect' class='form-select' onchange='selLLead()'><option></option>";
+            $sql="SELECT lNo, COUNT(lNo) AS frequency FROM `lineleaders` GROUP BY lNo ORDER BY `lineleaders`.`lNo` ASC;";
+            $result=mysqli_query($conn,$sql);
+            while($row=mysqli_fetch_assoc($result)){
+                if($q4==$row['lNo']){
+                    echo "<option value='" . $row['lNo'] . "' selected >" . $row['lNo'] . "</option>";
+                }else{
+                    echo "<option value='" . $row['lNo'] . "'>" . $row['lNo'] . "</option>";}                
+            }
+            echo "</select>";
+            ?>
+        </div>
+        <div id="divLLead" class="col">
+        <label for="lineLeadSelect" class="form-label" style= "font-size:13px;font-weight: bold;">Line Leader:</label>            
+            <?php
+            echo "<select name='lineLead' id='lineLeadSelect' class='form-select' onchange='selLNoSel();'><option></option>";
+            $sql="SELECT lLead FROM lineLeaders";
+            $result=mysqli_query($conn,$sql);
+            while($row=mysqli_fetch_assoc($result)){
+                if($q5==$row['lLead']){
+                    echo "<option value='" . $row['lLead'] . "' selected >" . $row['lLead'] . "</option>";
+                }else{
+                    echo "<option value='" . $row['lLead'] . "'>" . $row['lLead'] . "</option>";}                
+            }
+            echo "</select>";
+            ?>
+        </div>
+        <div class="col">
+            <label for="itemKey" class="form-label" style= "font-weight: bold;">Item Key:</label>
+            <input id="itemKey" name="itemKey"  maxlength="7" oninput="formatIK(this)"  class="form-control">
         </div>
         <div class="container mt-4">
             <a id="wi" name="links" href = "fm.php?page=wi" style = "text-decoration: none; color:white;">
@@ -361,15 +398,80 @@ include("connecto.php");
             var selA=document.getElementById('divisionSelect').value;
             var selB=document.getElementById('customerSelect').value
             var selC=document.getElementById('partNumberSelect').value;
+            var inpD=document.getElementById('itemKey').value;
+            var selE=document.getElementById('lineNoSelect').value;
+            var selF=document.getElementById('lineLeadSelect').value;
             const stuff = document.querySelectorAll(`[name="links"]`);
-            var selArr=[selA,selB,selC]
+            var selArr=[selA,selB,selC,inpD,selE,selF]
             var qSel=encodeURIComponent(JSON.stringify(selArr))
             stuff.forEach(item=>{
                 item.href="fm.php?page="+item.id+"&q="+qSel;
-            })
-            
-            
+                
+            }) 
         }
+
+        function formatIK(input) {
+    let value = input.value; 
+    let numVal=0;
+    for(let i=0;i<value.length;i++){
+        if(parseInt(value[i]) || value[i]==0){
+            numVal+=1;
+        }
+    }
+    if (numVal>4 && numVal==value.length) {
+        input.value = value.slice(0, 4) + '-' + value.slice(4);
+    }
+    }
+
+    function selLLead(){
+    let lNo=document.getElementById('lineNoSelect').value;
+    let lLeadSel=document.getElementById('lineLeadSelect');
+
+
+    let xhr=new XMLHttpRequest();
+    xhr.open("GET","fetchlldrs.php?lNo="+encodeURIComponent(lNo),true);
+    xhr.onload=function(){
+        if(this.status===200){
+            let data = JSON.parse(this.responseText);
+            lLeadSel.innerHTML = "<option></option>";  // Reset dropdown
+            data.forEach(function(leader) {
+                let option = document.createElement("option");
+                option.value = leader;
+                option.textContent = leader;
+                lLeadSel.appendChild(option);
+            });
+        }
+    }
+    xhr.send();
+    filter()
+}
+
+function selLNoSel() {
+    let lLead = document.getElementById('lineLeadSelect').value;  // Get selected Line Leader
+    let lNoSelect = document.getElementById('lineNoSelect');      // Get Line Number dropdown
+
+    if (lLead === "") {
+        lNoSelect.value = ""; // Reset dropdown if no Line Leader is selected
+        return;
+    }
+
+    let xhr = new XMLHttpRequest();
+    xhr.open("GET", "fetchlNo.php?lLead=" + encodeURIComponent(lLead), true);
+    xhr.onload = function () {
+        if (this.status === 200) {
+            let data = JSON.parse(this.responseText);
+            
+            if (data.length > 0) {
+                // Auto-select the first Line Number if available
+                lNoSelect.value = data[0];
+                
+            }
+        }
+    };
+    xhr.send();
+    filter()
+}
+
     </script>
 </body>
 
