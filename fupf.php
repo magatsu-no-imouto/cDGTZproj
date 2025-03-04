@@ -33,6 +33,8 @@ while($row=mysqli_fetch_assoc($finda)){
     }
     $countA+=1;
 }
+
+
 if($countA>=1){
     $custShort=$_POST['custShort'];
     $sqlaa="INSERT INTO `customer`(`customerName`,`customerShort`,`dateAdded`) VALUES ('$customer','$custShort','$date')";
@@ -104,10 +106,10 @@ if($countD>=1){
     }
 }
 
-$fileName="f-".$custShort."-".$partNo."".$itemKey;
+$fileName="f-".$custShort."-".$partNo."".$itemKey."-".$lNo."-".$fileType;
 
-$sql = "INSERT INTO `files` (`division`, `customer`, `partNo`, `itemKey`, `lineNo`, `lineLeader`, `fileName`, `filetype`) 
-        VALUES ('$division', '$customer', '$partNo', '$itemKey','$lNo', '$lLead', '$fileName', '$fileType')";
+$sql = "INSERT INTO `files` (`division`, `customer`, `partNo`, `itemKey`, `lineNo`, `lineLeader`, `fileName`, `filetype`,`dateAdded`) 
+        VALUES ('$division', '$customer', '$partNo', '$itemKey','$lNo', '$lLead', '$fileName', '$fileType','$date')";
 
 $result = mysqli_query($conn, $sql);
 if($result){
@@ -116,13 +118,17 @@ if($result){
 }else{
     echo "<p>file database error</p>";
 }
+
 echo "<p>".$_FILES['file']['tmp_name']."</p>";
-$location="files/".$fileType."/".$fileName."-".$fileType."".$fileExt;
+$location="files/".$fileType."/".$fileName."".$fileExt;
 if(move_uploaded_file($_FILES['file']['tmp_name'],$location)){
     echo '<p>File Uploaded</p>';
 }else{
     echo "error";
 }
+
+
+
 
 ?>
 </body>

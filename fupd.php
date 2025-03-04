@@ -2,7 +2,6 @@
 include("connecto.php");
 ?>
 <!DOCTYPE html>
-<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -16,48 +15,31 @@ include("connecto.php");
         background-color: rgb(74, 96, 128);
         color: white;
     }
+    
     .heldfile{
         border: 3px solid black;
+        
     }
     .heldfile:hover{
         border: 4px dashed red;
         border-radius: 5px;
         cursor:pointer;
     }
+    .heldBTN{
+        border:none;
+        border-radius: 5px 10px;
+        margin-bottom:5px;
+    }
+    .heldBTN:hover{
+        background-color: red;
+    }
 </style>
 <body class="container mt-4">
-    <!--[]name of the page selected from Hub-->
-    <?php
-    $page=$_GET['page'];
-    $name="";
-    if($page==="wi"){
-        $name="Work Instruction";
-    }else if($page==="cp"){
-        $name="Control Plan";
-    }else if($page==="fic"){
-        $name="Final Inspection Checkpoints";
-    }else if($page==="ps"){
-        $name="Product Specifications";
-    }else if($page==="md"){
-        $name="Material Details";
-    }else if($page==="diaor"){
-        //[]unsure about what this one means. I'll ask later.
-        $name="Daily Individual Aggregate(?) Output Report";
-    }else if($page==="dmc"){
-        $name="Daily Maintenance Sheet";
-    }else if($page==="par"){
-        $name="Product Assembly Record";
-    }else if($page==="dcior"){
-        $name="Daily Crimping Inspection Output Report";
-    }
-
-    echo "<h1 class=\"mb-3 text-center py-3\" style=\"background-color: rgb(105, 105, 105); border-radius: 20px; margin-top: 20px;\">".$name."</h1>";
-    ?>
-    <!-- Search Filters -->
-    <div class="row mb-3">
-        <form id="fomm" method="post">
+<h1 class="mb-3 text-center py-3" style="background-color: rgb(105, 105, 105); border-radius: 20px; margin-top: 20px;">UPDATE A FILE</h1>
+<div class="row mb-3">
+        <form id="fom" action="test.php" method="post" enctype="multipart/form-data">
         <div class="row">
-            <div class="col">
+            <div id="divDivision" class="col">
             <label for="divisionSelect" class="form-label" style= "font-weight: bold;">Division:</label>
             <?php
             $q=array();
@@ -101,8 +83,7 @@ include("connecto.php");
 
 
             ?>
-
-            <select name='division' id='divisionSelect' class='form-select'><option></option>
+            <select name='division' id='divisionSelect' class='form-select' onchange="changeSelFunc('FIND')"><option></option>
             <?php
             $sql="SELECT divisionName FROM division";
             $result=mysqli_query($conn,$sql);
@@ -115,12 +96,13 @@ include("connecto.php");
             }
             echo "</select>";
             ?>
+            <button id="divBTN" type="button" onclick="changeInput('divDivision','divBTN');">new</button>
         </div>
         
-        <div class="col">
+        <div id="divCustomer" class="col">
             <label for="customerSelect" class="form-label" style= "font-weight: bold;">Customer:</label>
             <?php
-            echo "<select name='customer' id='customerSelect' class='form-select'><option></option>";
+            echo "<select name='customer' id='customerSelect' class='form-select' onchange='changeSelFunc(\"FIND\")'><option></option>";
             $sql="SELECT customerName FROM customer";
             $result=mysqli_query($conn,$sql);
             while($row=mysqli_fetch_assoc($result)){
@@ -131,11 +113,12 @@ include("connecto.php");
             }
             echo "</select>";
             ?>
+            <button id="custBTN" type="button" onclick="changeInput('divCustomer','custBTN');">new</button>
         </div>
-        <div class="col">
+        <div id="divParts" class="col">
             <label for="partNumberSelect" class="form-label" style= "font-weight: bold;">Part No:</label>            
             <?php
-            echo "<select name='partNumber' id='partNumberSelect' class='form-select'><option></option>";
+            echo "<select name='partNumber' id='partNumberSelect' onchange='changeSelFunc(\"FIND\")' class='form-select'><option></option>";
             $sql="SELECT partNo FROM parts";
             $result=mysqli_query($conn,$sql);
             while($row=mysqli_fetch_assoc($result)){
@@ -146,6 +129,7 @@ include("connecto.php");
             }
             echo "</select>";
             ?>
+            <button id="partBTN" type="button" onclick="changeInput('divParts','partBTN');">new</button>
         </div>
         <div id="divLNo" class="col">
             <label for="lineNoSelect" class="form-label" style= "font-weight: bold;">Line No:</label>            
@@ -154,13 +138,14 @@ include("connecto.php");
             $sql="SELECT lNo, COUNT(lNo) AS frequency FROM `lineleaders` GROUP BY lNo ORDER BY `lineleaders`.`lNo` ASC;";
             $result=mysqli_query($conn,$sql);
             while($row=mysqli_fetch_assoc($result)){
-                if($q5==$row['lNo']){
+                if($q4==$row['lNo']){
                     echo "<option value='" . $row['lNo'] . "' selected >" . $row['lNo'] . "</option>";
                 }else{
                     echo "<option value='" . $row['lNo'] . "'>" . $row['lNo'] . "</option>";}                
             }
             echo "</select>";
             ?>
+            <button id="lNoBTN" type="button" onclick="changeInput('divLNo','lNoBTN');">new</button>
         </div>
         <div id="divLLead" class="col">
         <label for="lineLeadSelect" class="form-label" style= "font-size:10px;font-weight: bold;">Line Leader:</label>            
@@ -169,39 +154,46 @@ include("connecto.php");
             $sql="SELECT lLead FROM lineLeaders";
             $result=mysqli_query($conn,$sql);
             while($row=mysqli_fetch_assoc($result)){
-                if($q6==$row['lLead']){
+                if($q5==$row['lLead']){
                     echo "<option value='" . $row['lLead'] . "' selected >" . $row['lLead'] . "</option>";
                 }else{
                     echo "<option value='" . $row['lLead'] . "'>" . $row['lLead'] . "</option>";}                
             }
             echo "</select>";
             ?>
+            <button id="lLeadBTN" type="button" onclick="changeInput('divLLead','lLeadBTN');">new</button>
         </div>
         <div class="col">
-            <label for="itemKey" class="form-label" style= "font-size:12px;font-weight: bold;">Item Key:</label>
-            <?php
-            if($q4!=""){
-                echo "<input id='itemKey' name='itemKey' maxlength='4' value='$q4' class='form-control'>";
-            }else{
-                echo "<input id='itemKey' name='itemKey' maxlength='4' class='form-control'>";
-            }
-            ?>
+            <label for="itemKey" class="form-label" style= "font-size:14px;font-weight: bold;">Item Key:</label>
+            <input id="itemKey" name="itemKey"  maxlength="4" oninput="changeSelFunc('FIND')" class="form-control">
         </div>
-    </div>
+        <div class="col">
+            <label for="fileTypeSel" class="form-label" style= "font-weight: bold;">Doc. Type:</label>
+            <select name="fileType" id="fileTypeSel" class="form-select">
+                <option value=""></option>
+                <option value="wi">Work Instruction</option>
+                <option value="cp">Control Plan</option>
+                <option value="fic">Final Inspection Check</option>
+                <option value="ps">Product Specifications</option>
+                <option value="md">Material Details</option>
+                <option value="diaor">Daily Individual Aggregate Output Report</option>
+                <option value="dmc">Daily Maintenance Checksheet</option>
+                <option value="par">Product Assembly Record</option>
+                <option value="dcior">Daily Crimping Inspection Output Report</option>
+            </select>
+        </div>
+        <input type="file" name="file" id="fileInput" onchange="changeSelFunc('INSERT')" class="form-control">    
+        </div>
+        <input name="selFile" id="selectedFile" class="form-control" >
+        <input name="selFunction" id="selFunction" class="form-control" value="INSERT" readonly>
         <div class="col-md-3 d-flex justify-content-center">
-            <button name="submit" class="btn btn-primary w-100" style= "font-weight: bold; background-color: rgb(140, 139, 137);">Search</button>
+            <button name="submit" id="submitBTN" type="submit" class="btn btn-primary w-100" style= "font-weight: bold; background-color: rgb(140, 139, 137);">Find</button>
             <button type="button" class="btn btn-primary w-100" style="margin-left: 10px; font-weight: bold; background-color: rgb(140, 139, 137);" onclick="redirectHub()">Back</button>
-            </div>
         </div>
-        </form>
+    
     </div>
-
-    <div>
-    <?php
-    //submit button takes the value of the Select
-    //and fills $find accordingly to build the parameters.
-    //of the SQL
-if(isset($_POST['submit'])){
+<?php
+   if(isset($_POST['submit'])){
     $find="";
     $empy=1;
     if($_POST['division'] != ""){
@@ -252,15 +244,17 @@ if(isset($_POST['submit'])){
     $q[4]=$_POST['lineNo'];
     $q[5]=$_POST['lineLead'];
 
-    $filterQ="WHERE fileType='$page'";
+    $filterQ="WHERE fileType='".$_POST['fileType']."'";
     if($empy==0){
-        $filterQ="AND fileType='$page'";
+        $filterQ="AND fileType='".$_POST['fileType']."'";
         
     }
-    
+    if($_POST['fileType']==""){
+        $filterQ="";
+    }
     //sql query is built and php constructs the html elements
     $sql="SELECT * FROM files $find $filterQ";
-    
+    echo $sql;
     $result=mysqli_query($conn,$sql);
     if($result){
         $noRows=mysqli_num_rows($result);
@@ -276,9 +270,10 @@ if(isset($_POST['submit'])){
             if($cellCount==0){
                 echo "<tr>";
             }
-            echo "<td><img width='100px' style='margin: auto;' src="."'crap.jpg'"." class='heldfile' onclick=\"showFile('".$row['fileName']."')\" /><br>
-            ".$row['fileName']."-".$row['filetype']."
-            </td>";
+            echo "<td><img width='100px' style='margin: auto;' src="."'crap.jpg'"." class='heldfile'/><br>
+            ".$row['fileName']."-<br>";
+            echo "<button class='heldBTN'>trash</button> <button class='heldBTN'>update</button>";
+            echo "</td>";
             if($cellCount==4 || $cellCount==$lastR){
                 echo "</tr>";
                 $cellCount=0;
@@ -350,7 +345,7 @@ if(isset($_POST['submit'])){
         }
         $sql="SELECT * FROM files $find $filterQ";
     }else{
-        $sql="SELECT * FROM files WHERE fileType='$page'";
+        $sql="SELECT * FROM files ORDER BY `filetype` DeSC";
     }
     $result=mysqli_query($conn,$sql);
     if($result){
@@ -367,9 +362,11 @@ if(isset($_POST['submit'])){
             if($cellCount==0){
                 echo "<tr>";
             }
-            echo "<td><img width='100px' style='margin: auto;' src="."'crap.jpg'"." class='heldfile' onclick=\"showFile('".$row['fileName']."')\" /><br>
-            ".$row['fileName']."-".$row['filetype']."
-            </td>";
+            echo "<td><img width='100px' style='margin: auto;' id='".$row['fileName']."' onclick='selectFile(\"".$row['fileName']."\",this)' src="."'crap.jpg'"." class='heldfile' /><br>
+            ".$row['fileName']."<br>";
+            echo "<button class='heldBTN'>trash</button>";
+            echo "<button class='heldBTN'>update</button>";
+            echo "</td>";
             if($cellCount==4 || $cellCount==$lastR){
                 echo "</tr>";
                 $cellCount=0;
@@ -386,30 +383,82 @@ if(isset($_POST['submit'])){
     }
 }
 ?>
-</div>
-<div id="fileContainer" class="text-center mt-4">
-    <iframe id="fileIframe" style="display:none" width="100%" height="500px"></iframe>
-</div>
+</form>
 
-    <script>
-      function showFile(filename) {
-        var page2="fm"
-        var page=<?php echo "'".$page."'";
-        ?>
 
-        var q=<?php echo json_encode($q);
-        ?>
 
-        var qE = encodeURIComponent(JSON.stringify(q));
-        window.location.replace(`found.php?filename=${filename}&rtrn=${page2}&page=${page}&q=${qE}`);
+</body>
+<script>
+
+let prevID
+
+function changeSelFunc(COMMANDO){
+    var selectFunction=document.getElementById('selFunction');
+    var please=COMMANDO;
+    var submBTN=document.getElementById('submitBTN')
+    var divSel=document.getElementById('divisionSelect')
+    var custSel=document.getElementById('customerSelect')
+    var partNoSel=document.getElementById('partNumberSelect')
+    var lineNoSel=document.getElementById('lineNoSelect')
+    var lineLdSel=document.getElementById('lineLeadSelect')
+    var itemKey=document.getElementById('itemKey')
+    var fileInp=document.getElementById('fileInput')
+    var fileSel=document.getElementById('selectedFile')
+    var x=(divSel.value!="" || custSel.value!="" || partNoSel.value!="" || lineNoSel.value!="" || lineLdSel.value!="" || itemKey.value!="");
+    var y=(fileInput.files.length !=0)
+    var z=(fileSel.value!="")
+    console.log("filters: "+x+"\nnewfile: "+y+"\nselected file: "+z+"\ntrigger: "+please);
+    var a=true;
+    var b=false;
+    console.log((x==a && y==b && z==b))
+    
+    if(COMMANDO=="FIND"){
+        document.getElementById("fom").removeAttribute('action')
+        document.getElementById("fom").removeAttribute('enctype')
+        submBTN.innerHTML="FIND"
+    }else if(COMMANDO=="INSERT"){
+        document.getElementById("fom").setAttribute('action','fupf.php');
+        document.getElementById("fom").setAttribute('enctype','multipart/form-data');
+        submBTN.innerHTML="UPLOAD"
+    }else if(COMMANDO=="UPDATE"){
+        document.getElementById("fom").setAttribute('action','fupdf.php');
+        document.getElementById("fom").setAttribute('enctype','multipart/form-data');
+        submBTN.innerHTML="UPDATE"
+    }
+    selectFunction.value=please;
 }
 
-    
+
+function selectFile(id,fileholder){
+    var selectedFile=document.getElementById('selectedFile');
+    var selectFunction=document.getElementById('selFunction');
+    if(prevID!=id && selectedFile.value!=""){
+        var prevFile=document.getElementById(prevID);
+        prevFile.style="border: 3px black solid"
+        
+    }
+    prevID=id;
+    if(selectedFile.value!="" && selectedFile.value==id){
+        selectedFile.value="";
+        fileholder.style="border: 3px black solid";
+    }else{
+        selectedFile.value=id;
+        fileholder.style="border: 5px red solid"
+    }
+    changeSelFunc('UPDATE');
+}
+
+function removeFile(id){
+    //trash button, pass id to fdel.php, which would 
+}
 
     function redirectHub(){
         window.location.replace('centralHub.php')
     }
 
+    document.addEventListener("DOMContentLoaded", function() {
+    document.querySelector("form").addEventListener("submit", validateForm);
+});
 
 function selLLead(){
     let lNo=document.getElementById('lineNoSelect').value;
@@ -431,6 +480,7 @@ function selLLead(){
         }
     }
     xhr.send();
+    changeSelFunc('FIND')
 }
 
 function selLNoSel() {
@@ -438,8 +488,7 @@ function selLNoSel() {
     let lNoSelect = document.getElementById('lineNoSelect');      // Get Line Number dropdown
 
     if (lLead === "") {
-        lNoSelect.value = ""; 
-        // Reset dropdown if no Line Leader is selected
+        lNoSelect.value = ""; // Reset dropdown if no Line Leader is selected
         return;
     }
 
@@ -450,16 +499,84 @@ function selLNoSel() {
             let data = JSON.parse(this.responseText);
             
             if (data.length > 0) {
-                // Auto-select the first Line Number if available
                 lNoSelect.value = data[0];
-                
+                changeSelFunc('FIND')
             }
         }
     };
     xhr.send();
 }
-    </script>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-</body>
+
+
+function validateForm(event) {
+    let selFunc=document.getElementById('selFunction');
+    if(selFunc.value=="INSERT"){
+        let error = false;
+    let messages = [];
+
+    let division = document.querySelector("[name='division']").value;
+    let customer = document.querySelector("[name='customer']").value;
+    let partNumber = document.querySelector("[name='partNumber']").value;
+    let lNo=document.querySelector("[name='lineNo']").value;
+    let lLead=document.querySelector("[name='lineLead']").value;
+    let itemKey = document.querySelector("[name='itemKey']").value;
+    let fileType = document.querySelector("[name='fileType']").value;
+    let fileInput = document.querySelector("[name='file']");
+
+    if (division === "") messages.push("Please select Division.");
+    if (customer === "") messages.push("Please select Customer.");
+    if (partNumber === "") messages.push("Please select Part Number.");
+    if (fileType === "") messages.push("Please select Document Type.");
+    if (lNo==="") messages.push("Please select Line Number.");
+    if (lLead==="") messages.push("Please select Line Leader.");
+   
+    if (fileInput.files.length === 0) {
+        messages.push("Please select a file.");
+    } else {
+        let fileName = fileInput.files[0].name;
+        let fileExtension = fileName.split('.').pop().toLowerCase();
+        if (fileExtension !== 'pdf') {
+            messages.push(`Invalid File: ${fileName} is not a PDF.`);
+        }
+    }
+
+    if (messages.length > 0) {
+        alert(messages.join("\n"));
+        event.preventDefault();
+    }
+    }
+}
+
+
+    
+    function changeInput(fieldId,btnID) {
+    var container = document.getElementById(fieldId);
+    var selectElement = container.querySelector("select");
+    if (selectElement) {
+        var inputElement = document.createElement("input");
+        inputElement.type = "text";
+        inputElement.id=selectElement.id;
+        inputElement.name = selectElement.name;
+        inputElement.className = "form-control";
+        inputElement.value = selectElement.value;
+
+        container.replaceChild(inputElement, selectElement);
+
+    }
+    if(fieldId==="divCustomer"){
+        var inputElement2 = document.createElement("input");
+        container.id="divCustom";
+        inputElement2.type = "text";
+        inputElement2.name = "custShort";
+        inputElement2.className = "form-control mt-2";
+        container.appendChild(inputElement2);
+    }
+    var button=document.getElementById(btnID);
+    button.hidden=true;
+}
+
+
+
+</script>
 </html>

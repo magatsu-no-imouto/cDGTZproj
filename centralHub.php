@@ -260,7 +260,7 @@ include("connecto.php");
         </div>
         <div class="col">
             <label for="itemKey" class="form-label" style= "font-weight: bold;">Item Key:</label>
-            <input id="itemKey" name="itemKey"  maxlength="7" oninput="formatIK(this)"  class="form-control">
+            <input id="itemKey" name="itemKey" oninput='filter();' maxlength="4" class="form-control">
         </div>
         <div class="container mt-4">
             <a id="wi" name="links" href = "fm.php?page=wi" style = "text-decoration: none; color:white;">
@@ -369,6 +369,7 @@ include("connecto.php");
         <div class="row mb-3">
         
         <button name="submit" class="btn btn-primary w-100" style= "font-weight: bold; background-color: rgb(140, 139, 137);" type="button" onclick="window.location.replace('fup.php')">upload file</button>
+        <button name="submit" class="btn btn-primary w-100" style= "font-weight: bold; background-color: rgb(140, 139, 137);" type="button" onclick="window.location.replace('fupd.php')">update file</button>
     </section>
 
     <!-- Footer Section -->
@@ -410,19 +411,6 @@ include("connecto.php");
             }) 
         }
 
-        function formatIK(input) {
-    let value = input.value; 
-    let numVal=0;
-    for(let i=0;i<value.length;i++){
-        if(parseInt(value[i]) || value[i]==0){
-            numVal+=1;
-        }
-    }
-    if (numVal>4 && numVal==value.length) {
-        input.value = value.slice(0, 4) + '-' + value.slice(4);
-    }
-    }
-
     function selLLead(){
     let lNo=document.getElementById('lineNoSelect').value;
     let lLeadSel=document.getElementById('lineLeadSelect');
@@ -443,7 +431,7 @@ include("connecto.php");
         }
     }
     xhr.send();
-    filter()
+    filter();
 }
 
 function selLNoSel() {
@@ -464,12 +452,12 @@ function selLNoSel() {
             if (data.length > 0) {
                 // Auto-select the first Line Number if available
                 lNoSelect.value = data[0];
-                
+                filter()
             }
         }
     };
     xhr.send();
-    filter()
+    
 }
 
     </script>

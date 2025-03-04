@@ -15,8 +15,10 @@ include("connecto.php");
         background-color: rgb(74, 96, 128);
         color: white;
     }
+    
 </style>
 <body class="container mt-4">
+<h1 class="mb-3 text-center py-3" style="background-color: rgb(105, 105, 105); border-radius: 20px; margin-top: 20px;">UPLOAD A FILE</h1>
 <div class="row mb-3">
         <form action="fupf.php" method="post" enctype="multipart/form-data">
         <div class="row">
@@ -135,7 +137,7 @@ include("connecto.php");
         </div>
         <div class="col">
             <label for="itemKey" class="form-label" style= "font-size:14px;font-weight: bold;">Item Key:</label>
-            <input id="itemKey" name="itemKey"  maxlength="7" oninput="formatIK(this)"  class="form-control">
+            <input id="itemKey" name="itemKey"  maxlength="4"  class="form-control">
         </div>
         <div class="col">
             <label for="fileTypeSel" class="form-label" style= "font-weight: bold;">Doc. Type:</label>
@@ -224,21 +226,6 @@ function selLNoSel() {
 }
 
 
-function formatIK(input) {
-    let value = input.value; 
-    let numVal=0;
-    for(let i=0;i<value.length;i++){
-        if(parseInt(value[i]) || value[i]==0){
-            numVal+=1;
-           
-        }else{
-           
-        }
-    }
-    if (numVal>4 && numVal==value.length) {
-        input.value = value.slice(0, 4) + '-' + value.slice(4);
-    }
-}
 
 function validateForm(event) {
     let error = false;
@@ -259,11 +246,10 @@ function validateForm(event) {
     if (fileType === "") messages.push("Please select Document Type.");
     if (lNo==="") messages.push("Please select Line Number.");
     if (lLead==="") messages.push("Please select Line Leader.");
-    let itemKeyPattern = /^\d{4}-\d{1}$/;  
-    if (!itemKeyPattern.test(itemKey)) {
-        messages.push("Invalid Key: Format must be 4 digits, a hyphen, and 1 digit (e.g., 1234-5).");
+    if(itemKey==="") messages.push("Please input the item key");
+    if(!parseInt(itemKey)){
+        messages.push("Invalid Item Key: please input the last 4 digits");
     }
-
     if (fileInput.files.length === 0) {
         messages.push("Please select a file.");
     } else {

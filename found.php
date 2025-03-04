@@ -18,6 +18,13 @@
 </style>
 <body class="container mt-4">
         <?php
+        /*
+        Weird bug found; when file becomes update, the file viewer would display the older file instead of the newer file.
+        Known solutions:
+        -restarting server
+        -deleting cache
+        -switching to EDGE seems to work better tho
+        */ 
         $rtrn=$_GET['rtrn'];
         $page=$_GET['page'];
         $q=json_decode(urldecode($_GET['q']), true);
