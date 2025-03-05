@@ -66,7 +66,8 @@ include("connecto.php");
         .gallery .card-img-top {
             
             height: 100px;
-            width: 100%;
+            width: 50%;
+            margin
             object-fit: cover;
             transition: all 0.3s ease;
         }
@@ -267,7 +268,7 @@ include("connecto.php");
             <div class="row row-cols-3 row-cols-md-3 g-3">
                 <div class="col-sm">
                     <div class="card">
-                        <img src="crap.jpg" class="card-img-top" alt="Artwork 1">
+                        <img src="crap.png" class="card-img-top" alt="Artwork 1">
                         <div class="card-body">
                             <h5 class="card-title">WORK INSTRUCTION</h5>
                             
@@ -278,7 +279,7 @@ include("connecto.php");
             <a name="links" id="cp" href = "fm.php?page=cp" style = "text-decoration: none; color:white;">
             <div class="col-sm">
                     <div class="card">
-                        <img src="crap.jpg" class="card-img-top" alt="Artwork 3">
+                        <img src="crap.png" class="card-img-top" alt="Artwork 3">
                         <div class="card-body">
                             <h5 class="card-title">CONTROL PLAN</h5>
                             
@@ -290,7 +291,7 @@ include("connecto.php");
             <a name="links" id="fic" href = "fm.php?page=fic" style = "text-decoration: none; color:white;">
                 <div class="col-sm">
                     <div class="card">
-                        <img src="crap.jpg" class="card-img-top" alt="Artwork 4">
+                        <img src="crap.png" class="card-img-top" alt="Artwork 4">
                         <div class="card-body">
                             <h5 class="card-title">FIC</h5>
             
@@ -301,7 +302,7 @@ include("connecto.php");
             <a name="links" id="ps" href = "fm.php?page=ps" style = "text-decoration: none; color:white;">
                 <div class="col-sm">
                     <div class="card">
-                        <img src="crap.jpg" class="card-img-top" alt="Artwork 5">
+                        <img src="crap.png" class="card-img-top" alt="Artwork 5">
                         <div class="card-body">
                             <h5 class="card-title">PRODUCT SPECIFICATIONS</h5>
                            
@@ -312,7 +313,7 @@ include("connecto.php");
             <a name="links" id="md" href = "fm.php?page=md" style = "text-decoration: none; color:white;">
                 <div class="col-sm">
                     <div class="card">
-                        <img src="crap.jpg" class="card-img-top" alt="Artwork 6">
+                        <img src="crap.png" class="card-img-top" alt="Artwork 6">
                         <div class="card-body">
                             <h5 class="card-title">MATERIAL DETAILS</h5>
                            
@@ -323,7 +324,7 @@ include("connecto.php");
             <a name="links" id="diaor" href = "fm.php?page=diaor" style = "text-decoration: none; color:white;">
                 <div class="col-sm">
                     <div class="card">
-                        <img src="crap.jpg" class="card-img-top" alt="Artwork 6">
+                        <img src="crap.png" class="card-img-top" alt="Artwork 6">
                         <div class="card-body">
                             <h5 class="card-title">DIAOR</h5>
                            
@@ -334,7 +335,7 @@ include("connecto.php");
             <a name="links" id="dmc" href = "fm.php?page=dmc" style = "text-decoration: none; color:white;">
                 <div class="col-sm">
                     <div class="card">
-                        <img src="crap.jpg" class="card-img-top" alt="Artwork 6">
+                        <img src="crap.png" class="card-img-top" alt="Artwork 6">
                         <div class="card-body">
                             <h5 class="card-title">DAILY MAINTENANCE CHECKSHEET</h5>
                            
@@ -345,7 +346,7 @@ include("connecto.php");
             <a id="par" name="links" href = "fm.php?page=par" style = "text-decoration: none; color:white;">
                 <div class="col-sm">
                     <div class="card">
-                        <img src="crap.jpg" class="card-img-top" alt="Artwork 6">
+                        <img src="crap.png" class="card-img-top" alt="Artwork 6">
                         <div class="card-body">
                             <h5 class="card-title">PRODUCTION ASSEMBLY RECORD</h5>
                            
@@ -356,7 +357,7 @@ include("connecto.php");
             <a name="links" id="dcior" href = "fm.php?page=dcior" style = "text-decoration: none; color:white;">
                 <div class="col-sm">
                     <div class="card">
-                        <img src="crap.jpg" class="card-img-top" alt="Artwork 6">
+                        <img src="crap.png" class="card-img-top" alt="Artwork 6">
                         <div class="card-body">
                             <h5 class="card-title">DCIOR</h5>
                            
@@ -369,7 +370,7 @@ include("connecto.php");
         <div class="row mb-3">
         
         <button name="submit" class="btn btn-primary w-100" style= "font-weight: bold; background-color: rgb(140, 139, 137);" type="button" onclick="window.location.replace('fup.php')">upload file</button>
-        <button name="submit" class="btn btn-primary w-100" style= "font-weight: bold; background-color: rgb(140, 139, 137);" type="button" onclick="window.location.replace('fupd.php')">update file</button>
+        <button name="submit" class="btn btn-primary w-100" style= "font-weight: bold; background-color: rgb(140, 139, 137);" type="button" id="crud" onclick="window.location.replace('fupd.php')">update file</button>
     </section>
 
     <!-- Footer Section -->
@@ -406,9 +407,10 @@ include("connecto.php");
             var selArr=[selA,selB,selC,inpD,selE,selF]
             var qSel=encodeURIComponent(JSON.stringify(selArr))
             stuff.forEach(item=>{
-                item.href="fm.php?page="+item.id+"&q="+qSel;
-                
-            }) 
+                item.href="fm.php?page="+item.id+"&q="+qSel; 
+            })
+            document.getElementById('crud').removeAttribute('onclick')
+            document.getElementById('crud').setAttribute('onclick',"window.location.replace('fupd.php?q="+qSel+"')");
         }
 
     function selLLead(){

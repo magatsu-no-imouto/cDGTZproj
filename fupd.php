@@ -83,7 +83,7 @@ include("connecto.php");
 
 
             ?>
-            <select name='division' id='divisionSelect' class='form-select' onchange="changeSelFunc('FIND')"><option></option>
+            <select name='division' id='divisionSelect' class='form-select'><option></option>
             <?php
             $sql="SELECT divisionName FROM division";
             $result=mysqli_query($conn,$sql);
@@ -102,7 +102,7 @@ include("connecto.php");
         <div id="divCustomer" class="col">
             <label for="customerSelect" class="form-label" style= "font-weight: bold;">Customer:</label>
             <?php
-            echo "<select name='customer' id='customerSelect' class='form-select' onchange='changeSelFunc(\"FIND\")'><option></option>";
+            echo "<select name='customer' id='customerSelect' class='form-select'><option></option>";
             $sql="SELECT customerName FROM customer";
             $result=mysqli_query($conn,$sql);
             while($row=mysqli_fetch_assoc($result)){
@@ -118,7 +118,7 @@ include("connecto.php");
         <div id="divParts" class="col">
             <label for="partNumberSelect" class="form-label" style= "font-weight: bold;">Part No:</label>            
             <?php
-            echo "<select name='partNumber' id='partNumberSelect' onchange='changeSelFunc(\"FIND\")' class='form-select'><option></option>";
+            echo "<select name='partNumber' id='partNumberSelect' class='form-select'><option></option>";
             $sql="SELECT partNo FROM parts";
             $result=mysqli_query($conn,$sql);
             while($row=mysqli_fetch_assoc($result)){
@@ -138,7 +138,7 @@ include("connecto.php");
             $sql="SELECT lNo, COUNT(lNo) AS frequency FROM `lineleaders` GROUP BY lNo ORDER BY `lineleaders`.`lNo` ASC;";
             $result=mysqli_query($conn,$sql);
             while($row=mysqli_fetch_assoc($result)){
-                if($q4==$row['lNo']){
+                if($q5==$row['lNo']){
                     echo "<option value='" . $row['lNo'] . "' selected >" . $row['lNo'] . "</option>";
                 }else{
                     echo "<option value='" . $row['lNo'] . "'>" . $row['lNo'] . "</option>";}                
@@ -154,7 +154,7 @@ include("connecto.php");
             $sql="SELECT lLead FROM lineLeaders";
             $result=mysqli_query($conn,$sql);
             while($row=mysqli_fetch_assoc($result)){
-                if($q5==$row['lLead']){
+                if($q6==$row['lLead']){
                     echo "<option value='" . $row['lLead'] . "' selected >" . $row['lLead'] . "</option>";
                 }else{
                     echo "<option value='" . $row['lLead'] . "'>" . $row['lLead'] . "</option>";}                
@@ -165,7 +165,13 @@ include("connecto.php");
         </div>
         <div class="col">
             <label for="itemKey" class="form-label" style= "font-size:14px;font-weight: bold;">Item Key:</label>
-            <input id="itemKey" name="itemKey"  maxlength="4" oninput="changeSelFunc('FIND')" class="form-control">
+            <?php
+            if($q4!=""){
+                echo "<input id='itemKey' name='itemKey' maxlength='4' value='$q4' class='form-control'>";
+            }else{
+                echo "<input id='itemKey' name='itemKey' maxlength='4' class='form-control'>";
+            }
+            ?>
         </div>
         <div class="col">
             <label for="fileTypeSel" class="form-label" style= "font-weight: bold;">Doc. Type:</label>
@@ -182,12 +188,14 @@ include("connecto.php");
                 <option value="dcior">Daily Crimping Inspection Output Report</option>
             </select>
         </div>
-        <input type="file" name="file" id="fileInput" onchange="changeSelFunc('INSERT')" class="form-control">    
+        <input type="file" name="file" id="fileInput"  class="form-control">    
         </div>
-        <input name="selFile" id="selectedFile" class="form-control" >
-        <input name="selFunction" id="selFunction" class="form-control" value="INSERT" readonly>
+        <input name="selFile" id="selectedFile" class="form-control" hidden>
+        <input name="selFunction" id="selFunction" class="form-control" value="INSERT" readonly hidden>
         <div class="col-md-3 d-flex justify-content-center">
-            <button name="submit" id="submitBTN" type="submit" class="btn btn-primary w-100" style= "font-weight: bold; background-color: rgb(140, 139, 137);">Find</button>
+            <button name="submit" id="submitBTN" type="submit" class="btn btn-primary w-100" style= "font-weight: bold; background-color: rgb(140, 139, 137);" onclick="changeSelFunc('FIND'); return true">Find</button>
+            <button name="submit" id="submit1BTN" type="submit" class="btn btn-primary w-100" style= "font-weight: bold; background-color: rgb(140, 139, 137);" onclick="changeSelFunc('INSERT'); return true;">Insert</button>
+            <button name="submit" id="submit2BTN" type="submit" class="btn btn-primary w-100" style= "font-weight: bold; background-color: rgb(140, 139, 137);" onclick="changeSelFunc('UPDATE'); return true;">Update</button>
             <button type="button" class="btn btn-primary w-100" style="margin-left: 10px; font-weight: bold; background-color: rgb(140, 139, 137);" onclick="redirectHub()">Back</button>
         </div>
     
@@ -254,7 +262,6 @@ include("connecto.php");
     }
     //sql query is built and php constructs the html elements
     $sql="SELECT * FROM files $find $filterQ";
-    echo $sql;
     $result=mysqli_query($conn,$sql);
     if($result){
         $noRows=mysqli_num_rows($result);
@@ -270,8 +277,8 @@ include("connecto.php");
             if($cellCount==0){
                 echo "<tr>";
             }
-            echo "<td><img width='100px' style='margin: auto;' src="."'crap.jpg'"." class='heldfile'/><br>
-            ".$row['fileName']."-<br>";
+            echo "<td><img width='100px' style='margin: auto;' src="."'crap.jpg'"." onclick='selectFile(\"".$row['fileName']."\",this)' class='heldfile'/><br>
+            ".$row['fileName']."<br>";
             echo "<button class='heldBTN'>trash</button> <button class='heldBTN'>update</button>";
             echo "</td>";
             if($cellCount==4 || $cellCount==$lastR){
@@ -339,11 +346,7 @@ include("connecto.php");
         $q[4]=$q5;
         $q[5]=$q6;
     
-        $filterQ="WHERE fileType='$page'";
-        if($empy==0){
-            $filterQ="AND fileType='$page'";
-        }
-        $sql="SELECT * FROM files $find $filterQ";
+        $sql="SELECT * FROM files $find";
     }else{
         $sql="SELECT * FROM files ORDER BY `filetype` DeSC";
     }
@@ -395,35 +398,15 @@ let prevID
 function changeSelFunc(COMMANDO){
     var selectFunction=document.getElementById('selFunction');
     var please=COMMANDO;
-    var submBTN=document.getElementById('submitBTN')
-    var divSel=document.getElementById('divisionSelect')
-    var custSel=document.getElementById('customerSelect')
-    var partNoSel=document.getElementById('partNumberSelect')
-    var lineNoSel=document.getElementById('lineNoSelect')
-    var lineLdSel=document.getElementById('lineLeadSelect')
-    var itemKey=document.getElementById('itemKey')
-    var fileInp=document.getElementById('fileInput')
-    var fileSel=document.getElementById('selectedFile')
-    var x=(divSel.value!="" || custSel.value!="" || partNoSel.value!="" || lineNoSel.value!="" || lineLdSel.value!="" || itemKey.value!="");
-    var y=(fileInput.files.length !=0)
-    var z=(fileSel.value!="")
-    console.log("filters: "+x+"\nnewfile: "+y+"\nselected file: "+z+"\ntrigger: "+please);
-    var a=true;
-    var b=false;
-    console.log((x==a && y==b && z==b))
-    
     if(COMMANDO=="FIND"){
         document.getElementById("fom").removeAttribute('action')
         document.getElementById("fom").removeAttribute('enctype')
-        submBTN.innerHTML="FIND"
     }else if(COMMANDO=="INSERT"){
         document.getElementById("fom").setAttribute('action','fupf.php');
         document.getElementById("fom").setAttribute('enctype','multipart/form-data');
-        submBTN.innerHTML="UPLOAD"
     }else if(COMMANDO=="UPDATE"){
         document.getElementById("fom").setAttribute('action','fupdf.php');
         document.getElementById("fom").setAttribute('enctype','multipart/form-data');
-        submBTN.innerHTML="UPDATE"
     }
     selectFunction.value=please;
 }
@@ -445,12 +428,8 @@ function selectFile(id,fileholder){
         selectedFile.value=id;
         fileholder.style="border: 5px red solid"
     }
-    changeSelFunc('UPDATE');
 }
 
-function removeFile(id){
-    //trash button, pass id to fdel.php, which would 
-}
 
     function redirectHub(){
         window.location.replace('centralHub.php')
@@ -480,7 +459,6 @@ function selLLead(){
         }
     }
     xhr.send();
-    changeSelFunc('FIND')
 }
 
 function selLNoSel() {
@@ -500,7 +478,6 @@ function selLNoSel() {
             
             if (data.length > 0) {
                 lNoSelect.value = data[0];
-                changeSelFunc('FIND')
             }
         }
     };
@@ -511,10 +488,8 @@ function selLNoSel() {
 
 function validateForm(event) {
     let selFunc=document.getElementById('selFunction');
-    if(selFunc.value=="INSERT"){
-        let error = false;
     let messages = [];
-
+    if(selFunc.value=="INSERT"){
     let division = document.querySelector("[name='division']").value;
     let customer = document.querySelector("[name='customer']").value;
     let partNumber = document.querySelector("[name='partNumber']").value;
@@ -541,10 +516,23 @@ function validateForm(event) {
         }
     }
 
+    }else if(selFunc.value=="UPDATE"){
+        let fileInput = document.querySelector("[name='file']");
+        let selFile=document.querySelector("[name='selFile']").value;
+        if(selFile==="") messages.push("Please Select a File to update")
+        if (fileInput.files.length === 0) {
+        messages.push("Please select a file to use as a replacement.");
+    } else {
+        let fileName = fileInput.files[0].name;
+        let fileExtension = fileName.split('.').pop().toLowerCase();
+        if (fileExtension !== 'pdf') {
+            messages.push(`Invalid File: ${fileName} is not a PDF.`);
+        }
+    }
+    }
     if (messages.length > 0) {
         alert(messages.join("\n"));
         event.preventDefault();
-    }
     }
 }
 

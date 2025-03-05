@@ -367,7 +367,7 @@ if(isset($_POST['submit'])){
             if($cellCount==0){
                 echo "<tr>";
             }
-            echo "<td><img width='100px' style='margin: auto;' src="."'crap.jpg'"." class='heldfile' onclick=\"showFile('".$row['fileName']."')\" /><br>
+            echo "<td><img width='100px' style='margin: auto;' src="."'crap.png'"." class='heldfile' onclick=\"showFile('".$row['fileName']."')\" /><br>
             ".$row['fileName']."-".$row['filetype']."
             </td>";
             if($cellCount==4 || $cellCount==$lastR){
