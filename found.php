@@ -23,22 +23,20 @@
         Known solutions:
         -restarting server
         -deleting cache
-        -switching to EDGE seems to work better tho
+        -switching to EDGE seems to work better tho....but it mucks up the code. it's best not to change it.
         */ 
         $rtrn=$_GET['rtrn'];
         $page=$_GET['page'];
         $q=json_decode(urldecode($_GET['q']), true);
         $q2=json_encode($q);
         $qE = urlencode($q2);
-        echo "<button style=\"width:50%; height:10vh;\" onclick=\"window.location.replace('".$rtrn.".php?page=".$page."&q=".$qE."')\">BACK</button>
-        ";
-        ?>
+        echo "<button style=\"width:50%; height:10vh;\" onclick=\"window.location.replace('".$rtrn.".php?page=".$page."&q=".$qE."')\">BACK</button>";?>
         <button style="width:49%; height:10vh;" onclick="window.location.replace('centralHub.php')">HOME</button>
         
         <br>
         <?php 
         $file=$_GET['filename'];
-        echo "<iframe src=\"files/$page/$file.pdf\" style=\"height:90vh; width:100%; border:none;\"></iframe>";
+        echo "<iframe src=\"files/$page/$file\" style=\"height:90vh; width:100%; border:none;\"></iframe>";
 ?>
     </body>
 </html>

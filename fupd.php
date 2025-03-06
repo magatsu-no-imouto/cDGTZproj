@@ -348,7 +348,7 @@ include("connecto.php");
     
         $sql="SELECT * FROM files $find";
     }else{
-        $sql="SELECT * FROM files ORDER BY `filetype` DeSC";
+        $sql="SELECT * FROM files ORDER BY `fileType` DeSC";
     }
     $result=mysqli_query($conn,$sql);
     if($result){

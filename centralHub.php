@@ -65,9 +65,9 @@ include("connecto.php");
 
         .gallery .card-img-top {
             
-            height: 100px;
-            width: 50%;
-            margin
+            height: 90px;
+            width: 30%;
+            margin: auto;
             object-fit: cover;
             transition: all 0.3s ease;
         }
@@ -128,6 +128,7 @@ include("connecto.php");
         /* Dark mode toggle button */
         .dark-mode-toggle {
             position: fixed;
+            z-index:1;
             top: 20px;
             right: 20px;
             background-color:rgb(255, 255, 255);
@@ -141,8 +142,8 @@ include("connecto.php");
         }
 
         .dark-mode-toggle:hover {
-            background-color: #333;
-            color: white;
+            background-color: rgb(70, 60, 0);
+            color: orange;
         }
     </style>
 </head>
@@ -367,11 +368,11 @@ include("connecto.php");
                 </a>
             </div>
         </div>
+        </section>
         <div class="row mb-3">
         
-        <button name="submit" class="btn btn-primary w-100" style= "font-weight: bold; background-color: rgb(140, 139, 137);" type="button" onclick="window.location.replace('fup.php')">upload file</button>
-        <button name="submit" class="btn btn-primary w-100" style= "font-weight: bold; background-color: rgb(140, 139, 137);" type="button" id="crud" onclick="window.location.replace('fupd.php')">update file</button>
-    </section>
+        <button name="submit" class="btn btn-primary w-100" style= "font-weight: bold; background-color: rgb(140, 139, 137);" type="button" id="crud" onclick="window.location.replace('fupd.php')">Upload File</button>
+        </div>
 
     <!-- Footer Section -->
     <footer class="footer">

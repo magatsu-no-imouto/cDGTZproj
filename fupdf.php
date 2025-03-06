@@ -19,34 +19,33 @@ $partNo="";
 $lNo="";
 $lLead="";
 $itemKey="";
-$filetype="";
+$fileType="";
 $dateS=date('mdy');
-echo $dateS;
-echo "<br><br>";
+$dateA=date('m/d/y');
+
 $sql="SELECT * FROM files WHERE fileName='".$fileName."'";
 $result=mysqli_query($conn,$sql);
 if($row=mysqli_fetch_assoc($result)){
-    $customer=$row['customer'];
-    $division=$row['division'];
-    $partNo=$row['partNo'];
-    $lNo=$row['lineNo'];
-    $lLead=$row['lineLeader'];
-    $filetype=$row['filetype'];
+    $fileType=$row['fileType'];
 }
 $rando=sprintf('%04d', rand(1, 9999));
 echo $rando;
 
-$locationA="files/".$filetype."/".$fileName.".pdf";
-$locationB="files/".$filetype."/BACK"."/".$fileName."-BACK-".$dateS."-".$rando.".pdf";
+$locationA="files/".$fileType."/".$fileName;
+$locationB="files/".$fileType."/BACK"."/".$fileName."-BACK-".$dateS."-".$rando.".pdf";
 echo "<br><br>";
 echo "I will now put [".$locationA."] to [".$locationB."]";
 echo "<br><br>";
 if(copy($locationA,$locationB)){
-    echo '<p>viola</p>';
+    echo '<p>viola. Now to claim the original file as my own:</p>';
+    if( move_uploaded_file($_FILES['file']['tmp_name'],$locationA)){
+    echo '<script>window.location.replace(\'fupd.php\')</script>';  
+    }
 }else{
     echo "error";
 }
 
+$sql="UPDATE files SET dateAdded=".$dateA." WHERE fileName=".$fileName;
 ?>
 </body>
-</html>
+</html> 

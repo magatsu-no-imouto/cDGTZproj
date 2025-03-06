@@ -58,7 +58,9 @@ while($row=mysqli_fetch_assoc($findb)){
 }
 
 if($countB>1){
-    $sqlbb="INSERT INTO `division`(`divisionName`,`dateAdded`) VALUES ('$division','$date')";
+    $cData[$custShort]=$customer;
+    $cJSON=json_encode($cData);
+    $sqlbb="INSERT INTO `division`(`divisionName`,`customers`,`dateAdded`) VALUES ('$division','$cJSON','$date')";
     $sqlbf=mysqli_query($conn,$sqlbb);
     if($sqlbf){
         echo "<p>division database updated</p>";
@@ -105,16 +107,16 @@ if($countD>=1){
         echo "<p>Line Leader database error</p>";
     }
 }
-
-$fileName="f-".$custShort."-".$partNo."".$itemKey."-".$lNo."-".$fileType;
-
+$pItemKey="f-".$custShort."-".$itemKey;
+$fileName=$pItemKey." ".$partNo." $fileType";
+echo $fileName;
 $sql = "INSERT INTO `files` (`division`, `customer`, `partNo`, `itemKey`, `lineNo`, `lineLeader`, `fileName`, `filetype`,`dateAdded`) 
-        VALUES ('$division', '$customer', '$partNo', '$itemKey','$lNo', '$lLead', '$fileName', '$fileType','$date')";
+        VALUES ('$division', '$customer', '$partNo', '$pItemKey','$lNo', '$lLead', '$fileName.pdf', '$fileType','$date')";
 
 $result = mysqli_query($conn, $sql);
 if($result){
     echo "<p>file database updated</p>";
-    echo "<script>window.location.replace('fup.php')</script>";
+    echo "<script>window.location.replace('fupd.php')</script>";
 }else{
     echo "<p>file database error</p>";
 }
