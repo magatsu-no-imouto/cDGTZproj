@@ -201,190 +201,82 @@ include("connecto.php");
     
     </div>
 <?php
+   #variable assigning
+   $f=array();
+   $i=array("division","customer","partNo","lineNo","lineLead","itemKey","fileType");
+   $sql="SELECT * FROM `files` ";
    if(isset($_POST['submit'])){
-    $find="";
-    $empy=1;
-    if($_POST['division'] != ""){
-        $find.="WHERE division='".$_POST['division']."'";
-        $empy=0;
+    $f[0]=$_POST['division'];
+    $f[1]=$_POST['customer'];
+    $f[2]=$_POST['partNumber'];
+    $f[3]=$_POST['lineNo'];
+    $f[4]=$_POST['lineLead'];
+    $f[5]=$_POST['itemKey'];
+    $f[6]=$_POST['fileType'];
+   }else{
+    $f[0]=$q1;
+    $f[1]=$q2;
+    $f[2]=$q3;
+    $f[3]=$q5;
+    $f[4]=$q6;
+    $f[5]=$q4;
+    $f[6]=" ";
+   }
+   
+   $sql="SELECT * FROM `files` ";
+   $num=0;
+   foreach($i as $that){
+    if($that=="fileType" && ($f[$num]==" "|| $f[$num]=="")){
+        $sql.="ORDER BY `fileType` DESC";
+    }else if($num==6 && $f[$num]!="" && str_contains($sql,"WHERE")){
+        $sql.=" AND ".$that."='".$f[$num]."'";
+    }else if($num==6 && $f[$num]!=""){
+        $sql.=$f[$num];
+    }else if(str_contains($sql,"WHERE") && $f[$num]!="" && $that=="itemKey"){
+        $sql.=" AND ".$that." LIKE '%".$f[$num]."%' ";
+    }else if($f[$num]!="" && $that=="itemKey"){
+        $sql.="WHERE ".$that." LIKE '%".$f[$num]."%' ";
+    }else if(str_contains($sql,"WHERE") && $f[$num]!=""){
+        $sql.="AND ".$that."='".$f[$num]."' ";
+    }else if($f[$num]!=""){
+        $sql.="WHERE ".$that."='".$f[$num]."' ";
     }
-    //if value is NOT the first, it adds the AND before the variable
-    if($_POST['customer'] != "" && $find==""){
-        $find.="WHERE customer='".$_POST['customer']."'";
-        $empy=0;
-    }else if($_POST['customer'] != ""){
-        $find.=" AND customer='".$_POST['customer']."'";
-        $empy=0;
-    }
-    
-    if($_POST['partNumber'] != ""  && $find==""){
-        $find.="WHERE partNo='".$_POST['partNumber']."'";
-        $empy=0;
-    }else if($_POST['partNumber'] != ""){
-        $find.=" AND partNo='".$_POST['partNumber']."'";
-        $empy=0;
-    }
-    if($_POST['itemKey']!="" && $find==""){
-        $find.="WHERE itemKey LIKE '%".$_POST['itemKey']."%'";
-        $empy=0;
-    }else if($_POST['itemKey']!=""){
-        $find.=" AND itemKey LIKE '%".$_POST['itemKey']."%'";
-        $empy=0;
-    }
-    if($_POST['lineNo']!="" && $find==""){
-        $find.="WHERE lineNo='".$_POST['lineNo']."'";
-        $empy=0;
-    }else if($_POST['lineNo']!=""){
-        $find.=" AND lineNo='".$_POST['lineNo']."'";
-        $empy=0;
-    }
-    if($_POST['lineLead']!="" && $find==""){
-        $find.="WHERE lineLeader='".$_POST['lineLead']."'";
-        $empy=0;
-    }else if($_POST['lineLead']!=""){
-        $find.=" AND lineleader='".$_POST['lineLead']."'";
-        $empy=0;
-    }
-    $q[0]=$_POST['division'];
-    $q[1]=$_POST['customer'];
-    $q[2]=$_POST['partNumber'];
-    $q[3]=$_POST['itemKey'];
-    $q[4]=$_POST['lineNo'];
-    $q[5]=$_POST['lineLead'];
-
-    $filterQ="WHERE fileType='".$_POST['fileType']."'";
-    if($empy==0){
-        $filterQ="AND fileType='".$_POST['fileType']."'";
-        
-    }
-    if($_POST['fileType']==""){
-        $filterQ="";
-    }
-    //sql query is built and php constructs the html elements
-    $sql="SELECT * FROM files $find $filterQ";
-    $result=mysqli_query($conn,$sql);
-    if($result){
-        $noRows=mysqli_num_rows($result);
-        if($noRows>=1){
-            echo "<div class=\"mb-3 text-center py-3\" style=\"background-color: rgb(105, 105, 105); border-radius: 20px; margin-top: 20px;\">";
-            echo "<table class='text-center mx-auto w-auto' style='background-color: rgb(105, 105, 105)'>";
-        echo "<thead><tr><th colspan=".$noRows.">Files</th></tr></thead>";
-        echo "<tbody>";
-        echo "</div>";
-        $cellCount=1;
-        $lastR=mysqli_num_rows($result);
-        while($row = mysqli_fetch_array($result)){
-            if($cellCount==0){
-                echo "<tr>";
-            }
-            echo "<td><img width='100px' style='margin: auto;' src="."'crap.jpg'"." onclick='selectFile(\"".$row['fileName']."\",this)' class='heldfile'/><br>
-            ".$row['fileName']."<br>";
-            echo "<button class='heldBTN'>trash</button> <button class='heldBTN'>update</button>";
-            echo "</td>";
-            if($cellCount==4 || $cellCount==$lastR){
-                echo "</tr>";
-                $cellCount=0;
-            }
-            $cellCount+=1;
-        }   
-        echo "</tbody>";
-        echo "</table>";
-        }else{
-            echo "<p class=\"mb-3 text-center py-3\" style=\"background-color: rgb(105, 105, 105); border-radius: 20px; margin-top: 20px;\">No results found.</p>";
-        }   
-    }else{
-        echo "<p class=\"mb-3 text-center py-3\" style=\"background-color: rgb(105, 105, 105); border-radius: 20px; margin-top: 20px;\">No results found.</p>";
-    }
-} else {
-    $sql="";
-    if(!empty($q)){
-        $find="";
-        $empy=1;
-        if($q1!=""){
-            $find="WHERE division='".$q1."'";
-            $empy=0;
-        }
-        if($q2!="" && $find==""){
-            $find="WHERE customer='".$q2."'";
-            $empy=0;
-        }else if($q2!=""){
-            $find.=" AND customer='".$q2."'";
-            $empy=0;
-        }
-        if($q3!="" && $find==""){
-            $find="WHERE partNo='".$q3."'";
-            $empy=0;
-        }else if($q3!=""){
-            $find.=" AND partNo='".$q3."'";
-            $empy=0;
-        }
-        if($q4!="" && $find==""){
-            $find.="WHERE itemKey LIKE '%".$q4."%'";
-            $empy=0;
-        }else if($q4!=""){
-            $find.=" AND itemKey LIKE '%".$$q4."%'";
-            $empy=0;
-        }
-        if($q5!="" && $find==""){
-            $find="WHERE lineNo='".$q5."'";
-            $empy=0;
-        }else if($q5!=""){
-            $find.=" AND lineNo='".$q5."'";
-            $empy=0;
-        }
-        if($q6!="" && $find==""){
-            $find.="WHERE lineLeader='".$q6."'";
-            $empy=0;
-        }else if($q6!=""){
-            $find.=" AND lineleader='".$q6."'";
-            $empy=0;
-        }
-        $q[0]=$q1;
-        $q[1]=$q2;
-        $q[2]=$q3;
-        $q[3]=$q4;
-        $q[4]=$q5;
-        $q[5]=$q6;
-    
-        $sql="SELECT * FROM files $find";
-    }else{
-        $sql="SELECT * FROM files ORDER BY `fileType` DeSC";
-    }
-    $result=mysqli_query($conn,$sql);
-    if($result){
-        $noRows=mysqli_num_rows($result);
-        if($noRows>=1){
-            echo "<div class=\"mb-3 text-center py-3\" style=\"background-color: rgb(105, 105, 105); border-radius: 20px; margin-top: 20px;\">";
-            echo "<table class='text-center mx-auto w-auto' style='background-color: rgb(105, 105, 105)'>";
-        echo "<thead><tr><th colspan=".$noRows.">Files</th></tr></thead>";
-        echo "<tbody>";
-        echo "</div>";
-        $cellCount=1;
-        $lastR=mysqli_num_rows($result);
-        while($row = mysqli_fetch_array($result)){
-            if($cellCount==0){
-                echo "<tr>";
-            }
-            echo "<td><img width='100px' style='margin: auto;' id='".$row['fileName']."' onclick='selectFile(\"".$row['fileName']."\",this)' src="."'crap.jpg'"." class='heldfile' /><br>
-            ".$row['fileName']."<br>";
-            echo "<button class='heldBTN'>trash</button>";
-            echo "<button class='heldBTN'>update</button>";
-            echo "</td>";
-            if($cellCount==4 || $cellCount==$lastR){
-                echo "</tr>";
-                $cellCount=0;
-            }
-            $cellCount+=1;
-        }   
-        echo "</tbody>";
-        echo "</table>";
-        }else{
-            echo "<p class=\"mb-3 text-center py-3\" style=\"background-color: rgb(105, 105, 105); border-radius: 20px; margin-top: 20px;\">No results found.</p>";
-        }   
-    }else{
-        echo "<p class=\"mb-3 text-center py-3\" style=\"background-color: rgb(105, 105, 105); border-radius: 20px; margin-top: 20px;\">No results found.</p>";
-    }
-}
+    $num++;
+   }
+   $result=mysqli_query($conn,$sql);
+   if($result){
+       $noRows=mysqli_num_rows($result);
+       if($noRows>=1){
+           echo "<div class=\"mb-3 text-center py-3\" style=\"background-color: rgb(105, 105, 105); border-radius: 20px; margin-top: 20px;\">";
+           echo "<table class='text-center mx-auto w-auto' style='background-color: rgb(105, 105, 105)'>";
+       echo "<thead><tr><th colspan=".$noRows.">Files</th></tr></thead>";
+       echo "<tbody>";
+       echo "</div>";
+       $cellCount=1;
+       $lastR=mysqli_num_rows($result);
+       while($row = mysqli_fetch_array($result)){
+           if($cellCount==0){
+               echo "<tr>";
+           }
+           echo "<td><img width='100px' style='margin: auto;' id='".$row['fileName']."' onclick='selectFile(\"".$row['fileName']."\",this)' src="."'crap.jpg'"." class='heldfile' /><br>
+           ".$row['fileName']."<br>";
+           echo "<button type='button' class='heldBTN' onclick='deleteP(\"".$row['fileName']."\",\"".$row['fileType']."\")'>trash</button>";
+           echo "</td>";
+           if($cellCount==4 || $cellCount==$lastR){
+               echo "</tr>";
+               $cellCount=0;
+           }
+           $cellCount+=1;
+       }   
+       echo "</tbody>";
+       echo "</table>";
+       }else{
+           echo "<p class=\"mb-3 text-center py-3\" style=\"background-color: rgb(105, 105, 105); border-radius: 20px; margin-top: 20px;\">No results found.</p>";
+       }   
+   }else{
+       echo "<p class=\"mb-3 text-center py-3\" style=\"background-color: rgb(105, 105, 105); border-radius: 20px; margin-top: 20px;\">No results found.</p>";
+   }
+   
 ?>
 </form>
 
@@ -402,7 +294,7 @@ function changeSelFunc(COMMANDO){
         document.getElementById("fom").removeAttribute('action')
         document.getElementById("fom").removeAttribute('enctype')
     }else if(COMMANDO=="INSERT"){
-        document.getElementById("fom").setAttribute('action','fupf.php');
+        document.getElementById("fom").setAttribute('action','fupif.php');
         document.getElementById("fom").setAttribute('enctype','multipart/form-data');
     }else if(COMMANDO=="UPDATE"){
         document.getElementById("fom").setAttribute('action','fupdf.php');
@@ -564,7 +456,9 @@ function validateForm(event) {
     button.hidden=true;
 }
 
-
+function deleteP(id,type){
+    window.location.replace(`fupef.php?id=${id}&type=${type}`);    
+}
 
 </script>
 </html>

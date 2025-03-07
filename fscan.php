@@ -6,9 +6,17 @@
   $insertToken="";
   $docType=["wi","dmc","par","ps","fic","cp","dcior","md","diaor"];
   $date=date('m/d/Y');
-  $division="";
+  
+  $insertToken="INVENTORY";
+  foreach ($docType as $rows){
+    $dir=sprintf('%s/files/'.$rows,__DIR__);
+    echo $dir;
+    if (is_dir($dir) && $handle = opendir($dir)) {
+      while (($entry = readdir($handle)) !== false) {
+        if($entry !="." && $entry !=".." && str_contains($entry,".pdf") && str_contains($entry,"f-")){
+          $division="";
   $customer="";
-  $cNew="";
+  $cNew="*";
   $custShort="";
   $partNo="";
   $pNew="";
@@ -17,13 +25,6 @@
   $lineLeader="";
   $fileName="";
   $fileType="";
-  $insertToken="INVENTORY";
-  foreach ($docType as $rows){
-    $dir=sprintf('%s/files/'.$rows,__DIR__);
-    echo $dir;
-    if (is_dir($dir) && $handle = opendir($dir)) {
-      while (($entry = readdir($handle)) !== false) {
-        if($entry !="." && $entry !=".." && str_contains($entry,".pdf") && str_contains($entry,"f-")){
         echo "<br>FILE FOUND:",$entry,"<br>";
         $explode=explode(" ",$entry);
         $explode2=explode("-",$explode[0]);
@@ -42,6 +43,7 @@
           if(!empty($cust)){
             foreach($cust as $key=>$value){
               if($custShort==$key){
+                $cNew="";
                 $customer=$value;
                 $division=$row['divisionName'];
                 break;
@@ -96,6 +98,9 @@
             $changes.="PART TABLE UPDATED<br>";
           }
         }
+        if($division==""){
+          $division="UNASSIGNED";
+        }
         echo "--------------------<br>";
         echo "PARAMETERS:<br>";
         echo "--------------------<br>";
@@ -115,11 +120,39 @@
         }
       }
    }
-   closedir($handle);
-    }
   }
+  closedir($handle);
+  echo "<br>rechecking files:<br>";
+  $sql="SELECT * FROM `files` WHERE `fileType`='".$rows."'";
+   $result=mysqli_query($conn,$sql);
+   if($err=mysqli_error($conn)){
+    echo $err,"<br>";
+   }
+   $filecount=0;
+   while($q=mysqli_fetch_assoc($result)){
+    $filecount++;
+    echo $q['fileName'];
+    $path=$dir."/".trim($q['fileName']);
+    if(file_exists($path)){
+      echo "<br>YES.<br>";
+    }else{
+      echo "<br>REMOVING. ".$q['fileName']."<br>";
+      $sql="DELETE FROM `files` WHERE `fileName`='".$q['fileName']."'";
+      $res=mysqli_query($conn,$sql);
+      if($err=mysqli_error($conn)){
+        echo "ERROR ",$er,"<br>";
+      }
+    }
+   }
+   if($filecount==0){
+    echo "EMPTY<br>";
+   }
+   
+
+}
 
   
+   
    
   ?>
 </div>

@@ -67,6 +67,7 @@ include("connecto.php");
             $q4="";
             $q5="";
             $q6="";
+            $q7="";
             if(isset($_GET['q'])){
                 $q=json_decode(urldecode($_GET['q']), true);
             }
@@ -90,6 +91,9 @@ include("connecto.php");
                     $q6=$q[5];
                 }
             }
+            if($_GET['page']!=""){
+                $q7=$_GET['page'];
+            } 
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $q1 = $_POST['division'] ?? "";
                 $q2 = $_POST['customer'] ?? "";
@@ -201,189 +205,83 @@ include("connecto.php");
     //submit button takes the value of the Select
     //and fills $find accordingly to build the parameters.
     //of the SQL
-if(isset($_POST['submit'])){
-    $find="";
-    $empy=1;
-    if($_POST['division'] != ""){
-        $find.="WHERE division='".$_POST['division']."'";
-        $empy=0;
-    }
-    //if value is NOT the first, it adds the AND before the variable
-    if($_POST['customer'] != "" && $find==""){
-        $find.="WHERE customer='".$_POST['customer']."'";
-        $empy=0;
-    }else if($_POST['customer'] != ""){
-        $find.=" AND customer='".$_POST['customer']."'";
-        $empy=0;
-    }
+    #variable assigning
+   $f=array();
+   $i=array("division","customer","partNo","lineNo","lineLead","itemKey","fileType");
+   $sql="SELECT * FROM `files` ";
+   if(isset($_POST['submit'])){
+    $f[0]=$_POST['division'];
+    $f[1]=$_POST['customer'];
+    $f[2]=$_POST['partNumber'];
+    $f[3]=$_POST['lineNo'];
+    $f[4]=$_POST['lineLead'];
+    $f[5]=$_POST['itemKey'];
+    $f[6]=$q7;
+   }else{
+    $f[0]=$q1;
+    $f[1]=$q2;
+    $f[2]=$q3;
+    $f[3]=$q5;
+    $f[4]=$q6;
+    $f[5]=$q4;
+    $f[6]=$q7;
+   }
+   
+   $sql="SELECT * FROM `files` ";
+   $num=0;
+   foreach($i as $that){
     
-    if($_POST['partNumber'] != ""  && $find==""){
-        $find.="WHERE partNo='".$_POST['partNumber']."'";
-        $empy=0;
-    }else if($_POST['partNumber'] != ""){
-        $find.=" AND partNo='".$_POST['partNumber']."'";
-        $empy=0;
+    if($that=="fileType" && ($f[$num]==" "|| $f[$num]=="")){
+        echo $num;
+        $sql.="ORDER BY `fileType` DESC";
+    }else if($num==6 && $f[$num]!="" && str_contains($sql,"WHERE")){
+        $sql.=" AND ".$that."='".$f[$num]."'";
+    }else if($num==6 && $f[$num]!=""){
+        $sql.="WHERE ".$that."='".$f[$num]."'";
+    }else if(str_contains($sql,"WHERE") && $f[$num]!="" && $that=="itemKey"){
+        $sql.=" AND ".$that." LIKE '%".$f[$num]."%' ";
+    }else if($f[$num]!="" && $that=="itemKey"){
+        $sql.="WHERE ".$that." LIKE '%".$f[$num]."%' ";
+    }else if(str_contains($sql,"WHERE") && $f[$num]!=""){
+        $sql.="AND ".$that."='".$f[$num]."' ";
+    }else if($f[$num]!=""){
+        $sql.="WHERE ".$that."='".$f[$num]."' ";
     }
-    if($_POST['itemKey']!="" && $find==""){
-        $find.="WHERE itemKey LIKE '%".$_POST['itemKey']."%'";
-        $empy=0;
-    }else if($_POST['itemKey']!=""){
-        $find.=" AND itemKey LIKE '%".$_POST['itemKey']."%'";
-        $empy=0;
-    }
-    if($_POST['lineNo']!="" && $find==""){
-        $find.="WHERE lineNo='".$_POST['lineNo']."'";
-        $empy=0;
-    }else if($_POST['lineNo']!=""){
-        $find.=" AND lineNo='".$_POST['lineNo']."'";
-        $empy=0;
-    }
-    if($_POST['lineLead']!="" && $find==""){
-        $find.="WHERE lineLeader='".$_POST['lineLead']."'";
-        $empy=0;
-    }else if($_POST['lineLead']!=""){
-        $find.=" AND lineleader='".$_POST['lineLead']."'";
-        $empy=0;
-    }
-    $q[0]=$_POST['division'];
-    $q[1]=$_POST['customer'];
-    $q[2]=$_POST['partNumber'];
-    $q[3]=$_POST['itemKey'];
-    $q[4]=$_POST['lineNo'];
-    $q[5]=$_POST['lineLead'];
-
-    $filterQ="WHERE fileType='$page'";
-    if($empy==0){
-        $filterQ="AND fileType='$page'";
-        
-    }
-    
-    //sql query is built and php constructs the html elements
-    $sql="SELECT * FROM files $find $filterQ";
-    
-    $result=mysqli_query($conn,$sql);
-    if($result){
-        $noRows=mysqli_num_rows($result);
-        if($noRows>=1){
-            echo "<div class=\"mb-3 text-center py-3\" style=\"background-color: rgb(105, 105, 105); border-radius: 20px; margin-top: 20px;\">";
-            echo "<table class='text-center mx-auto w-auto' style='background-color: rgb(105, 105, 105)'>";
-        echo "<thead><tr><th colspan=".$noRows.">Files</th></tr></thead>";
-        echo "<tbody>";
-        echo "</div>";
-        $cellCount=1;
-        $lastR=mysqli_num_rows($result);
-        while($row = mysqli_fetch_array($result)){
-            if($cellCount==0){
-                echo "<tr>";
-            }
-            echo "<td><img width='100px' style='margin: auto;' src="."'crap.jpg'"." class='heldfile' onclick=\"showFile('".$row['fileName']."')\" /><br>
-            ".$row['fileName']."
-            </td>";
-            if($cellCount==4 || $cellCount==$lastR){
-                echo "</tr>";
-                $cellCount=0;
-            }
-            $cellCount+=1;
-        }   
-        echo "</tbody>";
-        echo "</table>";
-        }else{
-            echo "<p class=\"mb-3 text-center py-3\" style=\"background-color: rgb(105, 105, 105); border-radius: 20px; margin-top: 20px;\">No results found.</p>";
-        }   
-    }else{
-        echo "<p class=\"mb-3 text-center py-3\" style=\"background-color: rgb(105, 105, 105); border-radius: 20px; margin-top: 20px;\">No results found.</p>";
-    }
-} else {
-    $sql="";
-    if(!empty($q)){
-        $find="";
-        $empy=1;
-        if($q1!=""){
-            $find="WHERE division='".$q1."'";
-            $empy=0;
-        }
-        if($q2!="" && $find==""){
-            $find="WHERE customer='".$q2."'";
-            $empy=0;
-        }else if($q2!=""){
-            $find.=" AND customer='".$q2."'";
-            $empy=0;
-        }
-        if($q3!="" && $find==""){
-            $find="WHERE partNo='".$q3."'";
-            $empy=0;
-        }else if($q3!=""){
-            $find.=" AND partNo='".$q3."'";
-            $empy=0;
-        }
-        if($q4!="" && $find==""){
-            $find.="WHERE itemKey LIKE '%".$q4."%'";
-            $empy=0;
-        }else if($q4!=""){
-            $find.=" AND itemKey LIKE '%".$$q4."%'";
-            $empy=0;
-        }
-        if($q5!="" && $find==""){
-            $find="WHERE lineNo='".$q5."'";
-            $empy=0;
-        }else if($q5!=""){
-            $find.=" AND lineNo='".$q5."'";
-            $empy=0;
-        }
-        if($q6!="" && $find==""){
-            $find.="WHERE lineLeader='".$q6."'";
-            $empy=0;
-        }else if($q6!=""){
-            $find.=" AND lineleader='".$q6."'";
-            $empy=0;
-        }
-        $q[0]=$q1;
-        $q[1]=$q2;
-        $q[2]=$q3;
-        $q[3]=$q4;
-        $q[4]=$q5;
-        $q[5]=$q6;
-    
-        $filterQ="WHERE fileType='$page'";
-        if($empy==0){
-            $filterQ="AND fileType='$page'";
-        }
-        $sql="SELECT * FROM files $find $filterQ";
-    }else{
-        $sql="SELECT * FROM files WHERE fileType='$page'";
-    }
-    $result=mysqli_query($conn,$sql);
-    if($result){
-        $noRows=mysqli_num_rows($result);
-        if($noRows>=1){
-            echo "<div class=\"mb-3 text-center py-3\" style=\"background-color: rgb(105, 105, 105); border-radius: 20px; margin-top: 20px;\">";
-            echo "<table class='text-center mx-auto w-auto' style='background-color: rgb(105, 105, 105)'>";
-        echo "<thead><tr><th colspan=".$noRows.">Files</th></tr></thead>";
-        echo "<tbody>";
-        echo "</div>";
-        $cellCount=1;
-        $lastR=mysqli_num_rows($result);
-        while($row = mysqli_fetch_array($result)){
-            if($cellCount==0){
-                echo "<tr>";
-            }
-            echo "<td><img width='100px' style='margin: auto;' src="."'crap.png'"." class='heldfile' onclick=\"showFile('".$row['fileName']."')\" /><br>
-            ".$row['fileName']."</td>";
-            if($cellCount==4 || $cellCount==$lastR){
-                echo "</tr>";
-                $cellCount=0;
-            }
-            $cellCount+=1;
-        }   
-        echo "</tbody>";
-        echo "</table>";
-        }else{
-            echo "<p class=\"mb-3 text-center py-3\" style=\"background-color: rgb(105, 105, 105); border-radius: 20px; margin-top: 20px;\">No results found.</p>";
-        }   
-    }else{
-        echo "<p class=\"mb-3 text-center py-3\" style=\"background-color: rgb(105, 105, 105); border-radius: 20px; margin-top: 20px;\">No results found.</p>";
-    }
-}
+    $num++;
+   }
+   $result=mysqli_query($conn,$sql);
+   if($result){
+       $noRows=mysqli_num_rows($result);
+       if($noRows>=1){
+           echo "<div class=\"mb-3 text-center py-3\" style=\"background-color: rgb(105, 105, 105); border-radius: 20px; margin-top: 20px;\">";
+           echo "<table class='text-center mx-auto w-auto' style='background-color: rgb(105, 105, 105)'>";
+       echo "<thead><tr><th colspan=".$noRows.">Files</th></tr></thead>";
+       echo "<tbody>";
+       echo "</div>";
+       $cellCount=1;
+       $lastR=mysqli_num_rows($result);
+       while($row = mysqli_fetch_array($result)){
+           if($cellCount==0){
+               echo "<tr>";
+           }
+           echo "<td><img width='100px' style='margin: auto;' id='".$row['fileName']."' onclick='showFile(\"".$row['fileName']."\")' src="."'crap.jpg'"."/><br>
+           ".$row['fileName']."<br>";
+           
+           echo "</td>";
+           if($cellCount==4 || $cellCount==$lastR){
+               echo "</tr>";
+               $cellCount=0;
+           }
+           $cellCount+=1;
+       }   
+       echo "</tbody>";
+       echo "</table>";
+       }else{
+           echo "<p class=\"mb-3 text-center py-3\" style=\"background-color: rgb(105, 105, 105); border-radius: 20px; margin-top: 20px;\">No results found.</p>";
+       }   
+   }else{
+       echo "<p class=\"mb-3 text-center py-3\" style=\"background-color: rgb(105, 105, 105); border-radius: 20px; margin-top: 20px;\">No results found.</p>";
+   }
 ?>
 </div>
 <div id="fileContainer" class="text-center mt-4">
@@ -395,6 +293,12 @@ if(isset($_POST['submit'])){
         var page2="fm"
         var page=<?php echo "'".$page."'";
         ?>
+        <?php
+        if(empty($q)){
+            $q=$f;
+        }
+        ?>
+
 
         var q=<?php echo json_encode($q);
         ?>

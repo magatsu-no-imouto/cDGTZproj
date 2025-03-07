@@ -18,15 +18,8 @@
 </style>
 <body class="container mt-4">
         <?php
-        /*
-        Weird bug found; when file becomes update, the file viewer would display the older file instead of the newer file.
-        Known solutions:
-        -restarting server
-        -deleting cache
-        -switching to EDGE seems to work better tho....but it mucks up the code. it's best not to change it.
-        */ 
-        $rtrn=$_GET['rtrn'];
-        $page=$_GET['page'];
+        $rtrn=htmlspecialchars($_GET['rtrn'] ?? '',ENT_QUOTES,'UTF-8');
+        $page=htmlspecialchars($_GET['page'] ?? '', ENT_QUOTES, 'UTF-8');
         $q=json_decode(urldecode($_GET['q']), true);
         $q2=json_encode($q);
         $qE = urlencode($q2);
@@ -36,7 +29,7 @@
         <br>
         <?php 
         $file=$_GET['filename'];
-        echo "<iframe src=\"files/$page/$file\" style=\"height:90vh; width:100%; border:none;\"></iframe>";
+        echo "<iframe src=\"files/$page/$file?t=".time()."\" style=\"height:85vh; width:100%; border:none;\"></iframe>";
 ?>
     </body>
 </html>
