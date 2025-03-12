@@ -4,16 +4,18 @@ include("connecto.php");
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" href="hepc.jpg" type="image/x-icon">
+    <link rel="icon" href="logo.jpg" type="image/x-icon">
     <title>File Manager</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 
 <style>
+    
     body{
-        background-color: rgb(74, 96, 128);
+        background-color:rgb(65,81,105);
         color: white;
     }
     .heldfile{
@@ -28,7 +30,9 @@ include("connecto.php");
 <body class="container mt-4">
     <!--[]name of the page selected from Hub-->
     <?php
-    $page=$_GET['page'];
+    if(isset($_GET['page'])){
+        $page=$_GET['page'];
+    }
     $name="";
     if($page==="wi"){
         $name="Work Instruction";
@@ -40,7 +44,7 @@ include("connecto.php");
         $name="Product Specifications";
     }else if($page==="md"){
         $name="Material Details";
-    }else if($page==="diaor"){
+    }else if($page==="daior"){
         //[]unsure about what this one means. I'll ask later.
         $name="Daily Individual Aggregate(?) Output Report";
     }else if($page==="dmc"){
@@ -51,12 +55,16 @@ include("connecto.php");
         $name="Daily Crimping Inspection Output Report";
     }
 
-    echo "<h1 class=\"mb-3 text-center py-3\" style=\"background-color: rgb(105, 105, 105); border-radius: 20px; margin-top: 20px;\">".$name."</h1>";
+    echo "<h1 class=\"mb-1 text-center py-3\" style=\"background-color: rgb(105, 105, 105); border-radius: 20px; margin-top: 20px;\">".$name."</h1>";
+    
     ?>
     <!-- Search Filters -->
-    <div class="row mb-3">
-        <form id="fomm" method="post">
-        <div class="row">
+    <div class="row mb-1">
+        <form id="fomm">
+        <?php
+        echo "<input name='page' value='".$page."' hidden>";
+        ?>
+        <div class="row mt-1 mb-1 py-3" style="background-color: rgb(105, 105, 105); border-radius: 20px;">
             <div class="col">
             <label for="divisionSelect" class="form-label" style= "font-weight: bold;">Division:</label>
             <?php
@@ -84,14 +92,8 @@ include("connecto.php");
                 if($q[3]!=""){
                     $q4=$q[3];
                 }
-                if($q[4]!=""){
-                    $q5=$q[4];
-                }
-                if($q[5]!=""){
-                    $q6=$q[5];
-                }
             }
-            if($_GET['page']!=""){
+            if(isset($_GET['page'])){
                 $q7=$_GET['page'];
             } 
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -106,7 +108,8 @@ include("connecto.php");
 
             ?>
 
-            <select name='division' id='divisionSelect' class='form-select'><option></option>
+            <select name='division' id='divisionSelect' class='form-select' onchange="selCust();
+"><option value=""></option>
             <?php
             $sql="SELECT divisionName FROM division";
             $result=mysqli_query($conn,$sql);
@@ -124,7 +127,7 @@ include("connecto.php");
         <div class="col">
             <label for="customerSelect" class="form-label" style= "font-weight: bold;">Customer:</label>
             <?php
-            echo "<select name='customer' id='customerSelect' class='form-select'><option></option>";
+            echo "<select name='customer' id='customerSelect' class='form-select' onchange='selDiv();'><option></option>";
             $sql="SELECT customerName FROM customer";
             $result=mysqli_query($conn,$sql);
             while($row=mysqli_fetch_assoc($result)){
@@ -138,8 +141,8 @@ include("connecto.php");
         </div>
         <div class="col">
             <label for="partNumberSelect" class="form-label" style= "font-weight: bold;">Part No:</label>            
+            <select name='partNumber' id='partNumberSelect' class='form-select' onchange="document.getElementById('fomm').requestSubmit();"><option></option>
             <?php
-            echo "<select name='partNumber' id='partNumberSelect' class='form-select'><option></option>";
             $sql="SELECT partNo FROM parts";
             $result=mysqli_query($conn,$sql);
             while($row=mysqli_fetch_assoc($result)){
@@ -151,80 +154,34 @@ include("connecto.php");
             echo "</select>";
             ?>
         </div>
-        <div id="divLNo" class="col">
-            <label for="lineNoSelect" class="form-label" style= "font-weight: bold;">Line No:</label>            
-            <?php
-            echo "<select name='lineNo' id='lineNoSelect' class='form-select' onchange='selLLead()'><option></option>";
-            $sql="SELECT lNo, COUNT(lNo) AS frequency FROM `lineleaders` GROUP BY lNo ORDER BY `lineleaders`.`lNo` ASC;";
-            $result=mysqli_query($conn,$sql);
-            while($row=mysqli_fetch_assoc($result)){
-                if($q5==$row['lNo']){
-                    echo "<option value='" . $row['lNo'] . "' selected >" . $row['lNo'] . "</option>";
-                }else{
-                    echo "<option value='" . $row['lNo'] . "'>" . $row['lNo'] . "</option>";}                
-            }
-            echo "</select>";
-            ?>
-        </div>
-        <div id="divLLead" class="col">
-        <label for="lineLeadSelect" class="form-label" style= "font-size:10px;font-weight: bold;">Line Leader:</label>            
-            <?php
-            echo "<select name='lineLead' id='lineLeadSelect' class='form-select' onchange='selLNoSel()'><option></option>";
-            $sql="SELECT lLead FROM lineLeaders";
-            $result=mysqli_query($conn,$sql);
-            while($row=mysqli_fetch_assoc($result)){
-                if($q6==$row['lLead']){
-                    echo "<option value='" . $row['lLead'] . "' selected >" . $row['lLead'] . "</option>";
-                }else{
-                    echo "<option value='" . $row['lLead'] . "'>" . $row['lLead'] . "</option>";}                
-            }
-            echo "</select>";
-            ?>
-        </div>
-        <div class="col">
-            <label for="itemKey" class="form-label" style= "font-size:12px;font-weight: bold;">Item Key:</label>
-            <?php
-            if($q4!=""){
-                echo "<input id='itemKey' name='itemKey' maxlength='4' value='$q4' class='form-control'>";
-            }else{
-                echo "<input id='itemKey' name='itemKey' maxlength='4' class='form-control'>";
-            }
-            ?>
-        </div>
     </div>
         <div class="col-md-3 d-flex justify-content-center">
-            <button name="submit" class="btn btn-primary w-100" style= "font-weight: bold; background-color: rgb(140, 139, 137);">Search</button>
+            <button class="btn btn-primary w-100" style= "font-weight: bold; background-color: rgb(140, 139, 137);">Search</button>
             <button type="button" class="btn btn-primary w-100" style="margin-left: 10px; font-weight: bold; background-color: rgb(140, 139, 137);" onclick="redirectHub()">Back</button>
             </div>
         </div>
         </form>
     </div>
 
-    <div>
+    <div id="resultsTable">
     <?php
     //submit button takes the value of the Select
     //and fills $find accordingly to build the parameters.
     //of the SQL
     #variable assigning
    $f=array();
-   $i=array("division","customer","partNo","lineNo","lineLead","itemKey","fileType");
+   $i=array("division","customer","partNo","fileType");
    $sql="SELECT * FROM `files` ";
    if(isset($_POST['submit'])){
     $f[0]=$_POST['division'];
     $f[1]=$_POST['customer'];
     $f[2]=$_POST['partNumber'];
-    $f[3]=$_POST['lineNo'];
-    $f[4]=$_POST['lineLead'];
-    $f[5]=$_POST['itemKey'];
-    $f[6]=$q7;
+    $f[3]=$q7;
    }else{
     $f[0]=$q1;
     $f[1]=$q2;
     $f[2]=$q3;
-    $f[3]=$q5;
-    $f[4]=$q6;
-    $f[5]=$q4;
-    $f[6]=$q7;
+    $f[3]=$q7;
    }
    
    $sql="SELECT * FROM `files` ";
@@ -234,14 +191,6 @@ include("connecto.php");
     if($that=="fileType" && ($f[$num]==" "|| $f[$num]=="")){
         echo $num;
         $sql.="ORDER BY `fileType` DESC";
-    }else if($num==6 && $f[$num]!="" && str_contains($sql,"WHERE")){
-        $sql.=" AND ".$that."='".$f[$num]."'";
-    }else if($num==6 && $f[$num]!=""){
-        $sql.="WHERE ".$that."='".$f[$num]."'";
-    }else if(str_contains($sql,"WHERE") && $f[$num]!="" && $that=="itemKey"){
-        $sql.=" AND ".$that." LIKE '%".$f[$num]."%' ";
-    }else if($f[$num]!="" && $that=="itemKey"){
-        $sql.="WHERE ".$that." LIKE '%".$f[$num]."%' ";
     }else if(str_contains($sql,"WHERE") && $f[$num]!=""){
         $sql.="AND ".$that."='".$f[$num]."' ";
     }else if($f[$num]!=""){
@@ -257,7 +206,7 @@ include("connecto.php");
            echo "<table class='text-center mx-auto w-auto' style='background-color: rgb(105, 105, 105)'>";
        echo "<thead><tr><th colspan=".$noRows.">Files</th></tr></thead>";
        echo "<tbody>";
-       echo "</div>";
+       
        $cellCount=1;
        $lastR=mysqli_num_rows($result);
        while($row = mysqli_fetch_array($result)){
@@ -268,7 +217,7 @@ include("connecto.php");
            ".$row['fileName']."<br>";
            
            echo "</td>";
-           if($cellCount==4 || $cellCount==$lastR){
+           if($cellCount==3 || $cellCount==$lastR){
                echo "</tr>";
                $cellCount=0;
            }
@@ -276,6 +225,7 @@ include("connecto.php");
        }   
        echo "</tbody>";
        echo "</table>";
+       echo "</div>";
        }else{
            echo "<p class=\"mb-3 text-center py-3\" style=\"background-color: rgb(105, 105, 105); border-radius: 20px; margin-top: 20px;\">No results found.</p>";
        }   
@@ -289,6 +239,7 @@ include("connecto.php");
 </div>
 
     <script>
+
       function showFile(filename) {
         var page2="fm"
         var page=<?php echo "'".$page."'";
@@ -299,18 +250,25 @@ include("connecto.php");
         }
         ?>
 
-
+        
         var q=<?php echo json_encode($q);
+        
         ?>
 
         var qE = encodeURIComponent(JSON.stringify(q));
+        
         window.location.replace(`found.php?filename=${filename}&rtrn=${page2}&page=${page}&q=${qE}`);
 }
 
     
 
     function redirectHub(){
-        window.location.replace('centralHub.php')
+        var selA=document.getElementById('divisionSelect').value;
+            var selB=document.getElementById('customerSelect').value
+            var selC=document.getElementById('partNumberSelect').value;
+            var selArr=[selA,selB,selC]
+            var qSel=encodeURIComponent(JSON.stringify(selArr))
+        window.location.replace(`/dgcentre/?q=${qSel}`);
     }
 
 
@@ -320,7 +278,7 @@ function selLLead(){
 
 
     let xhr=new XMLHttpRequest();
-    xhr.open("GET","fetchlldrs.php?lNo="+encodeURIComponent(lNo),true);
+    xhr.open("GET","/dgcentre/admin/fetchlldrs.php?lNo="+encodeURIComponent(lNo),true);
     xhr.onload=function(){
         if(this.status===200){
             let data = JSON.parse(this.responseText);
@@ -347,7 +305,7 @@ function selLNoSel() {
     }
 
     let xhr = new XMLHttpRequest();
-    xhr.open("GET", "fetchlNo.php?lLead=" + encodeURIComponent(lLead), true);
+    xhr.open("GET", "/dgcentre/admin/fetchlNo.php?lLead=" + encodeURIComponent(lLead), true);
     xhr.onload = function () {
         if (this.status === 200) {
             let data = JSON.parse(this.responseText);
@@ -361,6 +319,95 @@ function selLNoSel() {
     };
     xhr.send();
 }
+function selCust(){
+    let divisionN=document.getElementById('divisionSelect').value;
+    let custN=document.getElementById('customerSelect');
+    console.log(divisionN +" "+custN.value);
+    if(divisionN===""){
+        custN.value="";
+        
+    }
+    let xhr = new XMLHttpRequest();
+    xhr.open("GET", "/dgcentre/admin/fetchCust.php?divN=" + encodeURIComponent(divisionN), true);
+    xhr.onload = function () {
+        custN.innerHTML = "<option></option>";
+        if (this.status === 200) {
+            let base=this.responseText;
+            console.log(base);
+            let data = JSON.parse(this.responseText);
+            console.log(data);
+            if(typeof data[0]==="object"){
+                let dc=JSON.parse(data[0].customers)
+            console.log(dc);
+        custN.innerHTML = "<option></option>";
+            for(let key in dc){
+                let option=document.createElement("option");
+                option.value=dc[key]
+                option.textContent=dc[key];
+                custN.appendChild(option);
+            }
+            }else if(typeof data[0] === "string"){
+                data.forEach(customer => {
+                    let option = document.createElement("option");
+                    option.value = customer;
+                    option.textContent = customer;
+                    custN.appendChild(option);
+                });
+            }
+        }
+    };
+    xhr.send();
+    document.getElementById('fomm').requestSubmit();
+}
+
+function selDiv(){
+    let divisionN=document.getElementById('divisionSelect')
+    let custN=document.getElementById('customerSelect').value;
+    console.log(custN);
+    if(custN===""){
+        divisionN.value=""
+    }else{
+        let xhr = new XMLHttpRequest();
+    xhr.open("GET", "/dgcentre/admin/fetchDiv.php?custN=" + encodeURIComponent(custN), true);
+    xhr.onload = function () {
+        if (this.status === 200) {
+            let data = JSON.parse(this.responseText);
+            console.log(data);
+            if (data.length > 0) {
+                divisionN.value = data[0];
+            }
+        }
+    };
+    xhr.send();
+    }
+    
+    
+    
+    document.getElementById('fomm').requestSubmit();
+}
+
+document.addEventListener("DOMContentLoaded", function() {
+    document.getElementById("fomm").addEventListener("submit", function(event) {
+        event.preventDefault(); 
+        let fd = new FormData(this);
+
+        fetch("admin/fetchData.php", {
+            method: "POST",
+            body: fd
+        })
+        .then(response => response.text())
+        .then(data => {
+            let resultsTable = document.getElementById("resultsTable");
+            if (resultsTable) {
+                resultsTable.innerHTML = data; 
+            } else {
+                console.error("Element with ID 'resultsTable' not found!");
+            }
+        })
+        .catch(error => console.error("Error:", error));
+    });
+});
+
     </script>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

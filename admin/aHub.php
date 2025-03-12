@@ -1,12 +1,6 @@
 <?php
-include("connecto.php");
-session_start();
-if ($_SERVER['REQUEST_URI'] === 'centralHub.php') {
-    header("Location: /", true, 301);
-    exit;
-}
-session_unset();
-session_destroy();
+include(__DIR__ . '/../connecto.php');
+include('auth.php');
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -128,7 +122,6 @@ session_destroy();
 
         /* Dark Mode Styles */
         body.dark-mode {
-            background-color:rgb(65,81,105);
             color:rgb(230, 28, 28);
             transition: background-color 0.3s ease, color 0.3s ease, text-shadow 0.3s ease;
         }
@@ -201,48 +194,21 @@ session_destroy();
             margin-bottom:5px;
         }
         body{
-            background-color:rgb(113, 142, 187);
             color:rgb(231, 0, 0);
             transition:background-color 0.3s ease;
         }
     </style>
 </head>
-<?php
-            $q=array();
-            $q1="";
-            $q2="";
-            $q3="";
-            $q4="";
-            $q5="";
-            $q6="";
-            $q7="";
-            if(isset($_GET['q'])){
-                $q=json_decode(urldecode($_GET['q']), true);
-            }
-            if(!empty($q)){
-                if($q[0]!=""){
-                    $q1=$q[0];
-                }
-                if($q[1]!=""){
-                    $q2=$q[1];
-                }
-                if($q[2]!=""){
-                    $q3=$q[2];
-                }
-            }
-            if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-                $q1 = $_POST['division'] ?? "";
-                $q2 = $_POST['customer'] ?? "";
-                $q3 = $_POST['partNumber'] ?? "";
-            }
-            ?>
+
 <body class="dark-mode">
+    <!-- #warp Dark Mode Toggle Button-->
+    
     <!-- #warp Gallery -->
     <section class="gallery">
     <div class="container-md">
     <div class="row">
     <div class="col-2">
-        <img class="logo" src="logo.jpg" style="width:80px; height:80px;"></img>
+        <img class="logo" src="/dgcentre/logo.jpg" style="width:80px; height:80px;"></img>
     </div>
     <div class="col">
     <h3>Document Integration System</h3>
@@ -255,9 +221,9 @@ session_destroy();
             <!---#warp 9x9 container--->
             <div class="row page">
             <div class="col">
-            <a id="wi" name="links" href = "fm.php?page=wi" style = "text-decoration: none; color:white;">
+            <a id="wi" name="links" href = "fupd.php?page=wi" style = "text-decoration: none; color:white;">
                     <div class="card">
-                        <img src="crap.png" class="card-img-top" alt="Artwork 1">
+                        <img src="/dgcentre/brap.png" class="card-img-top" alt="Artwork 1">
                         <div class="card-body">
                             <h5 class="card-title">WORK INSTRUCTION</h5>
                         </div>
@@ -265,9 +231,9 @@ session_destroy();
                     </a>
                 </div>
                 <div class="col">
-            <a id="cp" name="links" href = "fm.php?page=cp" style = "text-decoration: none; color:white;">
+            <a id="cp" name="links" href = "fupd.php?page=cp" style = "text-decoration: none; color:white;">
                     <div class="card">
-                        <img src="crap.png" class="card-img-top" alt="Artwork 1">
+                        <img src="/dgcentre/brap.png" class="card-img-top" alt="Artwork 1">
                         <div class="card-body">
                             <h5 class="card-title">CONTROL PLAN</h5>
                         </div>
@@ -275,9 +241,9 @@ session_destroy();
                     </a>
                 </div>
                 <div class="col">
-            <a id="fic" name="links" href = "fm.php?page=fic" style = "text-decoration: none; color:white;">
+            <a id="fic" name="links" href = "fupd.php?page=fic" style = "text-decoration: none; color:white;">
                     <div class="card">
-                        <img src="crap.png" class="card-img-top" alt="Artwork 1">
+                        <img src="/dgcentre/brap.png" class="card-img-top" alt="Artwork 1">
                         <div class="card-body">
                             <h5 class="card-title">FINAL INSPECTION CHECK</h5>
                         </div>
@@ -287,9 +253,9 @@ session_destroy();
             </div>
             <div class="row page">
             <div class="col">
-            <a id="ps" name="links" href = "fm.php?page=ps" style = "text-decoration: none; color:white;">
+            <a id="ps" name="links" href = "fupd.php?page=ps" style = "text-decoration: none; color:white;">
                     <div class="card">
-                        <img src="crap.png" class="card-img-top" alt="Artwork 1">
+                        <img src="/dgcentre/brap.png" class="card-img-top" alt="Artwork 1">
                         <div class="card-body">
                             <h5 class="card-title">PRODUCT SPECIFICATIONS</h5>
                         </div>
@@ -297,9 +263,9 @@ session_destroy();
                     </a>
                 </div>
                 <div class="col">
-            <a id="md" name="links" href = "fm.php?page=wi" style = "text-decoration: none; color:white;">
+            <a id="md" name="links" href = "fupd.php?page=md" style = "text-decoration: none; color:white;">
                     <div class="card">
-                        <img src="crap.png" class="card-img-top" alt="Artwork 1">
+                        <img src="/dgcentre/brap.png" class="card-img-top" alt="Artwork 1">
                         <div class="card-body">
                             <h5 class="card-title">MATERIAL DETAILS FORM</h5>
                         </div>
@@ -307,9 +273,9 @@ session_destroy();
                     </a>
                 </div>
                 <div class="col">
-            <a id="daior" href = "" style = "text-decoration: none; color:white;">
+            <a id="daior" name="links" href = "" style = "text-decoration: none; color:white;">
                     <div class="card">
-                        <img src="brap.png" class="card-img-top" alt="Artwork 1">
+                        <img src="brap.png" class="card-img-top" alt="IN PROGRESS">
                         <div class="card-body">
                             <h5 class="card-title">DAIOR</h5>
                         </div>
@@ -319,9 +285,9 @@ session_destroy();
             </div>
             <div class="row page">
                 <div class="col">
-            <a id="dmc" href = "" style = "text-decoration: none; color:white;">
+            <a id="dmc" name="links" href = "" style = "text-decoration: none; color:white;">
                     <div class="card">
-                        <img src="brap.png" class="card-img-top" alt="Artwork 1">
+                        <img src="brap.png" class="card-img-top" alt="IN PROGRESS">
                         <div class="card-body">
                             <h5 class="card-title">DAILY MAINTENANCE CHECKSHEET</h5>
                         </div>
@@ -329,9 +295,9 @@ session_destroy();
                     </a>
                 </div>
                 <div class="col">
-            <a id="par" href = "" style = "text-decoration: none; color:white;">
+            <a id="par" name="links" href = "" style = "text-decoration: none; color:white;">
                     <div class="card">
-                        <img src="brap.png" class="card-img-top" alt="Artwork 1">
+                        <img src="brap.png" class="card-img-top" alt="IN PROGRESS">
                         <div class="card-body">
                             <h5 class="card-title">PRODUCTION ASSEMBLY RECORD</h5>
                         </div>
@@ -339,9 +305,9 @@ session_destroy();
                     </a>
                 </div>
                 <div class="col">
-            <a id="dcior" href = "" style = "text-decoration: none; color:white;">
+            <a id="dcior" name="links" href = "" style = "text-decoration: none; color:white;">
                     <div class="card">
-                        <img src="brap.png" class="card-img-top" alt="Artwork 1">
+                        <img src="brap.png" class="card-img-top" alt="IN PROGRESS">
                         <div class="card-body">
                             <h5 class="card-title">DCIOR</h5>
                         </div>
@@ -349,6 +315,20 @@ session_destroy();
                     </a>
                 </div>
         </div>    
+        <div class="container">
+        <div class="row">
+        <div class="col butt">
+            <button name="submit" class="btn btn-primary w-100" type="button" style="background-color:rgb(230, 28, 28); border:0;" onclick="window.location.replace('fscan.php')">SCAN</button>
+        </div>
+        <div class="col butt">
+        <button name="submit" class="btn btn-primary w-100" style= "font-weight: bold; background-color:rgb(230, 28, 28);; border: 0;" type="button" id="crud" onclick="window.location.replace('fupd.php')">Upload File</button>
+        </div>
+        <div class="col butt">
+        <button name="submit" class="btn btn-primary w-100 mx-1" style="background-color:rgb(230, 28, 28); border:0;" onclick="window.location.replace('/dgcentre/')">LOGOUT</button>
+        </div>
+        
+        </div>
+    </div>
     </div>
     <div class="col-3" style="padding-left:0px;">
     <div class="col filter">
@@ -390,7 +370,6 @@ session_destroy();
         <div class="col divFilt">
             <label for="partNumberSelect" class="form-label" style= "font-weight: bold;">Part No:</label>            
             <?php
-            echo $q1;
             echo "<select name='partNumber' id='partNumberSelect' class='form-select' onchange='filter()'><option></option>";
             $sql="SELECT partNo FROM parts";
             $result=mysqli_query($conn,$sql);
@@ -457,6 +436,9 @@ session_destroy();
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js"></script>
     <script>
+        // Toggle dark mode
+    
+
         function filter(){
             var selA=document.getElementById('divisionSelect').value;
             var selB=document.getElementById('customerSelect').value
@@ -468,11 +450,11 @@ session_destroy();
             var selArr=[selA,selB,selC,inpD,selE,selF]
             var qSel=encodeURIComponent(JSON.stringify(selArr))
             stuff.forEach(item=>{
-                item.href="fm.php?page="+item.id+"&q="+qSel; 
+                item.href="fupd.php?page="+item.id+"&q="+qSel; 
             })
+            document.getElementById('crud').removeAttribute('onclick')
+            document.getElementById('crud').setAttribute('onclick',"window.location.replace('fupd.php?q="+qSel+"')");
         }
-
-filter();
 
     function selLLead(){
     let lNo=document.getElementById('lineNoSelect').value;
@@ -480,7 +462,7 @@ filter();
 
 
     let xhr=new XMLHttpRequest();
-    xhr.open("GET","/dgcentre/admin/fetchlldrs.php?lNo="+encodeURIComponent(lNo),true);
+    xhr.open("GET","fetchlldrs.php?lNo="+encodeURIComponent(lNo),true);
     xhr.onload=function(){
         if(this.status===200){
             let data = JSON.parse(this.responseText);
@@ -506,7 +488,7 @@ function selLNoSel() {
         return;
     }
     let xhr = new XMLHttpRequest();
-    xhr.open("GET", "/dgcentre/admin/fetchlNo.php?lLead=" + encodeURIComponent(lLead), true);
+    xhr.open("GET", "fetchlNo.php?lLead=" + encodeURIComponent(lLead), true);
     xhr.onload = function () {
         if (this.status === 200) {
             let data = JSON.parse(this.responseText);
@@ -529,9 +511,8 @@ function selCust(){
         custN.value="";
         
     }
-    custN.innerHTML = "<option></option>";
     let xhr = new XMLHttpRequest();
-    xhr.open("GET", "/dgcentre/admin/fetchCust.php?divN=" + encodeURIComponent(divisionN), true);
+    xhr.open("GET", "fetchCust.php?divN=" + encodeURIComponent(divisionN), true);
     xhr.onload = function () {
         if (this.status === 200) {
             let base=this.responseText;
@@ -571,7 +552,7 @@ function selDiv(){
         selCust();
     }
     let xhr = new XMLHttpRequest();
-    xhr.open("GET", "/dgcentre/admin/fetchDiv.php?custN=" + encodeURIComponent(custN), true);
+    xhr.open("GET", "fetchDiv.php?custN=" + encodeURIComponent(custN), true);
     xhr.onload = function () {
         if (this.status === 200) {
             let data = JSON.parse(this.responseText);
