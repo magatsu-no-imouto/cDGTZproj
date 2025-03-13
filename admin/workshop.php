@@ -14,9 +14,9 @@ include(__DIR__ . '/../connecto.php');
     <!-- Custom styles -->
 </head>
 <style>
-    /**{
-            border: 1px solid red !important;
-    }  */
+    *{
+        border: 1px dashed red !important;
+    }
     .sizeplease{
         height:100px;
     }
@@ -40,48 +40,186 @@ include(__DIR__ . '/../connecto.php');
     body{
         background-color:rgb(65,81,105);color: white;
     }
-    
-    .heldfile{
-        border: 3px solid black;
-        
-    }
-    .heldfile:hover{
-        border: 4px dashed red;
-        border-radius: 5px;
-        cursor:pointer;
-    }
-    .heldBTN{
-        border:none;
-        border-radius: 5px 10px;
-        margin-bottom:5px;
-        color:red;
-    }
-    .heldBTN:hover{
-        background-color:rgb(210, 4, 45);
-        color:rgb(208,0,208);
-    }
-    .btn{
-        margin-top: 5px;
-        margin-left:10px;
-        border:none;
-        font-weight: bold; background-color: rgb(94,94,94);
-    }
-    select.form-control{
-        size:12px;
-    }
-    .addNu{
-        background-color:rgb(210, 4, 45);
-        border-radius:10px 5px;
-        border:none;
-        width:100%;
-    }
-
     .form-label{
-        font-size:10px;
+        font-size:24px;
     }
 </style>
-<body >
+<body>
+    <div class="container mx-auto w-auto">
+        <div class="row">
+            <div class="col text-center">
+                <h3>Daily Crimping Inspection Output Report</h3>
+            </div>
+        </div>
+    </div>
 
+    <div class="m-3 overflow-auto" style="height:500px">
+        <form class="m-3" id="fom" method="post">
+            <div class="row m-3 px-5">
+                <div class="col">
+                    <label for="itemKey">Item Key</label>
+                    <input id="itemKey" name="itemKey" class="form-control">
+                </div>
+            </div>
+            
+            <div class="row m-3 px-5">
+                <h3>Machine:</h3>
+                <div class="row m-1">
+                    <div class="col m-3">
+                        <input id="Auto" name="Machine" type="radio" value="Auto">
+                        <label for="Auto">Auto</label>
+                    </div>
+                    <div class="col m-3">
+                        <input id="SemiAuto" name="Machine" type="radio" value="SemiAuto">
+                        <label for="SemiAuto">Semi Automatic</label>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row m-3 px-5">
+                <div class="col">
+                    <label for="oName">Operator Name</label>
+                    <input id="oName" name="operatorName" class="form-control">
+                </div>
+            </div>
+            
+            <div class="row m-3 px-5">
+                <div class="col">
+                    <label for="cInsp">Crimping Inspector</label>
+                    <input id="cInsp" name="crimpInspector" class="form-control">
+                </div>
+            </div>
+            
+            <div class="row m-3 px-5">
+                <div class="col">
+                    <label for="lLead">Line Leader</label>
+                    <input id="lLead" name="lineLeader" class="form-control">
+                </div>
+            </div>
+            
+            <div class="row m-3 px-5">
+                <div class="col">
+                    <button type="button" onclick="goTime(this)" class="btn btn-primary">Start</button>
+                </div>
+                <div class="col">
+                    <label id="minutes" class="form-label">00</label>:<label id="seconds" class="form-label">00</label>
+                </div>
+            </div>
+            
+            <div class="row m-3 px-5">
+                <div class="col">
+                    <label for="hp1">HP No.</label>
+                    <input id="hp1" name="hp1" class="form-control">
+                </div>
+                <div class="col">
+                    <label for="hp2">HP No.</label>
+                    <input id="hp2" name="hp2" class="form-control">
+                </div>
+            </div>
+            
+            <div class="row m-3 px-5">
+                <div class="col">
+                    <label for="terminaNo1">Terminal No.</label>
+                    <input id="terminaNo1" name="terminaNo1" class="form-control">
+                </div>
+                <div class="col">
+                    <label for="terminaNo2">Terminal No.</label>
+                    <input id="terminaNo2" name="terminaNo2" class="form-control">
+                </div>
+            </div>
+            
+            <div class="row m-3 px-5">
+                <label>Wire Description</label>
+                <div class="col">
+                    <textarea id="wd1" name="wireDescription1" class="form-control"></textarea>
+                </div>
+                <div class="col">
+                    <textarea id="wd2" name="wireDescription2" class="form-control"></textarea>
+                </div>
+            </div>
+            
+            <div class="row m-3 px-5">
+                <div class="col">
+                    <label for="pNo">Production Number</label>
+                    <input id="pNo" name="pNo" class="form-control">
+                </div>
+            </div>
+            
+            <div class="row m-3 px-5">
+                <div class="col">
+                    <label for="inspQty">Inspected Qty</label>
+                    <input id="inspQty" name="inspQty" class="form-control">
+                </div>
+            </div>
+            
+            <div class="row m-3 px-5">
+                <div class="col">
+                    <label for="ipDefect">In Process Defect</label>
+                    <input id="ipDefect" name="ipDefect" class="form-control">
+                </div>
+            </div>
+            
+            <div class="row m-3 px-5">
+                <div class="col">
+                    <label for="ciDefect">CI Defect</label>
+                    <input id="ciDefect" name="ciDefect" class="form-control">
+                </div>
+            </div>
+            
+            <div class="row m-3 px-5">
+                <div class="col text-center">
+                    <button name="submit" type="submit" class="btn btn-primary">Submit</button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <?php
+    if(isset($_POST['submit'])){
+        print "<pre>";
+        echo print_r($_POST);
+        print "</pre>";
+    }
+    ?>
 </body>
 
+<script>
+    
+    var minutesLabel = document.getElementById("minutes");
+    var secondsLabel = document.getElementById("seconds");
+    var totalSeconds = 0;
+    var timerInterval;
+
+    function goTime(button) {
+        timerInterval = setInterval(setTime, 1000); 
+        button.removeAttribute('onclick');
+        button.setAttribute('onclick', 'stopTime(this)');
+        button.innerText = "End"; 
+    }
+
+function setTime() {
+  ++totalSeconds;
+  secondsLabel.innerHTML = pad(totalSeconds % 60);
+  minutesLabel.innerHTML = pad(parseInt(totalSeconds / 60));
+}
+
+function pad(val) {
+  var valString = val + "";
+  if (valString.length < 2) {
+    return "0" + valString;
+  } else {
+    return valString;
+  }
+}
+
+function stopTime(button) {
+        clearInterval(timerInterval);
+        button.removeAttribute('onclick');
+        button.setAttribute('onclick', 'goTime(this)');
+        button.innerText = "Start";
+    }
+
+    
+    
+</script>
 </html>

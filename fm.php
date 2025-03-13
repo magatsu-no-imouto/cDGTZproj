@@ -13,7 +13,19 @@ include("connecto.php");
 </head>
 
 <style>
-    
+    .sizeplease{
+        height:350px;
+    }
+    @media(min-height: 800px){
+        .sizeplease{
+            height:500px;
+        }
+    }
+    @media(min-height:1280px){
+        .sizeplease{
+        height:1000px;
+    }
+}
     body{
         background-color:rgb(65,81,105);
         color: white;
@@ -45,8 +57,7 @@ include("connecto.php");
     }else if($page==="md"){
         $name="Material Details";
     }else if($page==="daior"){
-        //[]unsure about what this one means. I'll ask later.
-        $name="Daily Individual Aggregate(?) Output Report";
+        $name="Daily Assembly Inspection Output Report";
     }else if($page==="dmc"){
         $name="Daily Maintenance Sheet";
     }else if($page==="par"){
@@ -202,8 +213,8 @@ include("connecto.php");
    if($result){
        $noRows=mysqli_num_rows($result);
        if($noRows>=1){
-           echo "<div class=\"mb-3 text-center py-3\" style=\"background-color: rgb(105, 105, 105); border-radius: 20px; margin-top: 20px;\">";
-           echo "<table class='text-center mx-auto w-auto' style='background-color: rgb(105, 105, 105)'>";
+        echo "<div class=\"container mb-3 text-center py-3 sizeplease overflow-auto\" style=\"background-color: rgb(105, 105, 105); border-radius: 20px; margin-top: 20px;\">";
+        echo "<table class='text-center mx-auto w-auto'>";
        echo "<thead><tr><th colspan=".$noRows.">Files</th></tr></thead>";
        echo "<tbody>";
        
@@ -213,7 +224,7 @@ include("connecto.php");
            if($cellCount==0){
                echo "<tr>";
            }
-           echo "<td><img width='100px' style='margin: auto;' id='".$row['fileName']."' onclick='showFile(\"".$row['fileName']."\")' src="."'crap.jpg'"."/><br>
+           echo "<td style='font-size: 12px;'><img width='50px' style='margin: auto;'  id='".$row['fileName']."' onclick='showFile(\"".$row['fileName']."\")' src="."'crap.png'"."/><br>
            ".$row['fileName']."<br>";
            
            echo "</td>";
@@ -380,18 +391,26 @@ function selDiv(){
     };
     xhr.send();
     }
-    
-    
-    
+
     document.getElementById('fomm').requestSubmit();
 }
+
+let debounceTimer;
+document.querySelectorAll("select").forEach(select => {
+    select.addEventListener("change", function () {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(() => {
+            document.getElementById("fomm").dispatchEvent(new Event("submit", { bubbles: true }));
+        }, 60); // Adjust delay as needed
+    });
+});
 
 document.addEventListener("DOMContentLoaded", function() {
     document.getElementById("fomm").addEventListener("submit", function(event) {
         event.preventDefault(); 
         let fd = new FormData(this);
 
-        fetch("admin/fetchData.php", {
+        fetch("admin/fetchData.php?setto=a", {
             method: "POST",
             body: fd
         })

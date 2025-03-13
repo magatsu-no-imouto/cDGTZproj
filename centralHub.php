@@ -117,6 +117,19 @@ session_destroy();
             padding: 18px 0;
         }
 
+        @media(min-height: 800px){
+            .card{
+                margin-top:20px !important;
+                margin-bottom:50px !important;
+            }
+        }
+        @media(min-height:1280px){
+        .card{
+                margin-top:20px !important;
+                margin-bottom:210px !important;
+            }
+        }
+
         .footer a {
             color: #fff;
             text-decoration: none;
@@ -204,6 +217,9 @@ session_destroy();
             background-color:rgb(113, 142, 187);
             color:rgb(231, 0, 0);
             transition:background-color 0.3s ease;
+        }
+        .form-select{
+            font-size:12px;
         }
     </style>
 </head>
@@ -356,7 +372,7 @@ session_destroy();
                 <div class="col divFilt">
         <!--#warp filter top, division top-->
                 <label for="divisionSelect" class="form-label" style= "font-weight: bold;">Division:</label>
-                <select name='division' id='divisionSelect' class='form-select' onchange="selCust()"><option></option>
+                <select name='division' id='divisionSelect' class='form-select' onchange="selCust()"><option value=""></option>
             <?php
             $sql="SELECT divisionName FROM division";
             $result=mysqli_query($conn,$sql);
@@ -566,10 +582,6 @@ function selDiv(){
     let divisionN=document.getElementById('divisionSelect')
     let custN=document.getElementById('customerSelect').value;
     console.log(custN);
-    if(custN===""){
-        divisionN.value=""
-        selCust();
-    }
     let xhr = new XMLHttpRequest();
     xhr.open("GET", "/dgcentre/admin/fetchDiv.php?custN=" + encodeURIComponent(custN), true);
     xhr.onload = function () {
@@ -581,6 +593,10 @@ function selDiv(){
                 divisionN.value = data[0];
             }
         }
+        if(custN===""){
+        divisionN.value=""
+        selCust();
+    }
     };
     xhr.send();
     filter()

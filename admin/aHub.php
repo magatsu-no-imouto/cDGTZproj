@@ -69,6 +69,18 @@ include('auth.php');
             background-color: rgb(94, 94, 94);
             transition: transform 0.3s ease, background-color 0.3s ease;
         }
+        @media(min-height: 800px){
+            .card{
+                margin-top:10px !important;
+                margin-bottom:30px !important;
+            }
+        }
+        @media(min-height:1280px){
+        .card{
+                margin-top:20px !important;
+                margin-bottom:190px !important;
+            }
+        }
 
         .gallery .card:hover {
             transform: translateY(-10px);
@@ -144,7 +156,6 @@ include('auth.php');
 
         body.dark-mode .gallery .card {
             background-color: rgb(94, 94, 94);
-            transition: transform 0.3s ease, background-color 0.3s ease;
         }
 
         body.dark-mode .footer {
@@ -178,7 +189,6 @@ include('auth.php');
             padding-left:5px;
             padding-right:5px;
             padding-bottom:5px;
-            transition: background-color 0.3s ease;
         }
         .col.butt{
             margin-top:24px;
@@ -192,6 +202,11 @@ include('auth.php');
         }
         .row.page{
             margin-bottom:5px;
+        }
+        .row.butt{
+            background-color:rgb(112, 125, 141);
+            padding-bottom:4px;
+            border-radius:10px;
         }
         body{
             color:rgb(231, 0, 0);
@@ -275,7 +290,7 @@ include('auth.php');
                 <div class="col">
             <a id="daior" name="links" href = "" style = "text-decoration: none; color:white;">
                     <div class="card">
-                        <img src="brap.png" class="card-img-top" alt="IN PROGRESS">
+                        <img src="/dgcentre/brap.png" class="card-img-top" alt="IN PROGRESS">
                         <div class="card-body">
                             <h5 class="card-title">DAIOR</h5>
                         </div>
@@ -287,7 +302,7 @@ include('auth.php');
                 <div class="col">
             <a id="dmc" name="links" href = "" style = "text-decoration: none; color:white;">
                     <div class="card">
-                        <img src="brap.png" class="card-img-top" alt="IN PROGRESS">
+                        <img src="/dgcentre/brap.png" class="card-img-top" alt="IN PROGRESS">
                         <div class="card-body">
                             <h5 class="card-title">DAILY MAINTENANCE CHECKSHEET</h5>
                         </div>
@@ -297,7 +312,7 @@ include('auth.php');
                 <div class="col">
             <a id="par" name="links" href = "" style = "text-decoration: none; color:white;">
                     <div class="card">
-                        <img src="brap.png" class="card-img-top" alt="IN PROGRESS">
+                        <img src="/dgcentre/brap.png" class="card-img-top" alt="IN PROGRESS">
                         <div class="card-body">
                             <h5 class="card-title">PRODUCTION ASSEMBLY RECORD</h5>
                         </div>
@@ -307,7 +322,7 @@ include('auth.php');
                 <div class="col">
             <a id="dcior" name="links" href = "" style = "text-decoration: none; color:white;">
                     <div class="card">
-                        <img src="brap.png" class="card-img-top" alt="IN PROGRESS">
+                        <img src="/dgcentre/brap.png" class="card-img-top" alt="IN PROGRESS">
                         <div class="card-body">
                             <h5 class="card-title">DCIOR</h5>
                         </div>
@@ -316,7 +331,7 @@ include('auth.php');
                 </div>
         </div>    
         <div class="container">
-        <div class="row">
+        <div class="row butt">
         <div class="col butt">
             <button name="submit" class="btn btn-primary w-100" type="button" style="background-color:rgb(230, 28, 28); border:0;" onclick="window.location.replace('fscan.php')">SCAN</button>
         </div>

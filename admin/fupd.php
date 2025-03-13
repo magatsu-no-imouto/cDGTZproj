@@ -59,7 +59,7 @@ include('auth.php');
     }
     .heldBTN:hover{
         background-color:rgb(210, 4, 45);
-        color:rgb(208,0,208);
+        color:rgb(0, 0, 0);
     }
     .btn{
         margin-top: 5px;
@@ -122,6 +122,7 @@ include('auth.php');
                 $q4 = $_POST['itemKey'] ?? "";
                 $q5 = $_POST['lNo']?? "";
                 $q6 = $_POST['lLead']?? "";
+                $q7 = $_POST['fileType']?? "";
             }
             if(isset($_GET['page'])){
                 $q7=$_GET['page'];
@@ -256,10 +257,10 @@ while($row=mysqli_fetch_assoc($result)){
     <input id="fileInput" name="files" type="file" class="form-control"></input>
 </div>
 <input name="selFile" id="selectedFile" class="form-control" hidden>
-        <input name="selFunction" id="selFunction" class="form-control" value="INSERT" readonly hidden>
+        <input name="selFunction" id="selFunction" class="form-control" value="FIND" readonly hidden>
 </div>
 <div class="row-md-3 d-flex justify-content-center">
-    <button class="btn btn-primary w-100" onclick="changeSelFunc('FIND'); return true">Find</button>
+    <button name="submit" class="btn btn-primary w-100" onclick="changeSelFunc('FIND'); return true">Find</button>
     <button class="btn btn-primary w-100" onclick="changeSelFunc('INSERT'); return true;">Insert</button>
     <button class="btn btn-primary w-100" onclick="changeSelFunc('UPDATE'); return true;">Update</button>
     <button type="button" class="btn btn-primary w-100" onclick="redirectHub()">Back</button>
@@ -267,15 +268,13 @@ while($row=mysqli_fetch_assoc($result)){
 </div>
 </form>
 </div>
-<div class="container text-center py-1" style="background-color: rgb(105, 105, 105); border-radius: 20px;">FILES</div>
-<div class="container sizeplease mb-1 text-center py-3 overflow-auto" style="background-color: rgb(105, 105, 105); border-radius: 20px; margin-top: 10px;">
-    <table class='text-center mx-auto w-auto'>
-<tbody>
-   <?php
+<div id="resultsTable">
+    <?php
    $f=array();
    $i=array("division","customer","partNo","lineNo","lineLead","itemKey","fileType");
    $sql="SELECT * FROM `files` ";
    if(isset($_POST['submit'])){
+ 
     $f[0]=$_POST['division'];
     $f[1]=$_POST['customer'];
     $f[2]=$_POST['partNumber'];
@@ -319,13 +318,17 @@ while($row=mysqli_fetch_assoc($result)){
    if($result){
     $noRows=mysqli_num_rows($result);
     if($noRows>=1){
+        echo "<div class=\"container mb-3 text-center py-3 sizeplease overflow-auto\" style=\"background-color: rgb(105, 105, 105); border-radius: 20px; margin-top: 20px;\">";
+           echo "<table class='text-center mx-auto w-auto'>";
+       echo "<thead><tr><th colspan=".$noRows.">Files</th></tr></thead>";
+       echo "<tbody>";
         $cellCount=1;
         $lastR=mysqli_num_rows($result);
         while($row = mysqli_fetch_array($result)){
             if($cellCount==0){
                 echo "<tr>";
             }
-            echo "<td style='width:1000px; font-size:12px; text-wrap:wrap;'><img width='50px' style='margin: auto;' id='".$row['fileName']."' onclick='selectFile(\"".$row['fileName']."\",this)' src="."'../crap.jpg'"." class='heldfile' /><br>".$row['fileName']."<br>";
+            echo "<td style='width:1000px; font-size:12px; text-wrap:wrap;'><img width='50px' style='margin: auto;' id='".$row['fileName']."' onclick='selectFile(\"".$row['fileName']."\",this)' src="."'/dgcentre/brap.png'"." class='heldfile' /><br>".$row['fileName']."<br>";
             echo "<button type='button' class='heldBTN' onclick='deleteP(\"".$row['fileName']."\",\"".$row['fileType']."\")'><i class=\"fas fa-trash\"></i></button>";
             echo "</td>";
             if($cellCount==4 || $cellCount==$lastR){
@@ -337,8 +340,6 @@ while($row=mysqli_fetch_assoc($result)){
     }
    }
    ?>
-</tbody>    
-</table>
 </div>
 </body>
 <script>
@@ -382,7 +383,7 @@ function selectFile(id,fileholder){
 
 
     function redirectHub(){
-        window.location.replace('aHub.php')
+        window.location.replace('/dgcentre/admin/')
     }
 
     document.addEventListener("DOMContentLoaded", function() {
@@ -447,7 +448,7 @@ function validateForm(event) {
     let lLead=document.querySelector("[name='lineLead']").value;
     let itemKey = document.querySelector("[name='itemKey']").value;
     let fileType = document.querySelector("[name='fileType']").value;
-    let fileInput = document.querySelector("[name='file']");
+    let fileInput = document.querySelector("[name='files']");
 
     if (division === "") messages.push("Please select Division.");
     if (customer === "") messages.push("Please select Customer.");
@@ -574,6 +575,40 @@ function selDiv(){
         }
     };
     xhr.send();
+    document.getElementById('fom').requestSubmit();
 }
+
+let debounceTimer;
+document.querySelectorAll("select").forEach(select => {
+    select.addEventListener("change", function () {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(() => {
+            document.getElementById("fom").dispatchEvent(new Event("submit", { bubbles: true }));
+        }, 60); // Adjust delay as needed
+    });
+});
+
+document.addEventListener("DOMContentLoaded", function() {
+    document.getElementById("fom").addEventListener("submit", function(event) {
+        event.preventDefault(); 
+        let fd = new FormData(this);
+
+        fetch("fetchData.php?setto=b", {
+            method: "POST",
+            body: fd
+        })
+        .then(response => response.text())
+        .then(data => {
+            let resultsTable = document.getElementById("resultsTable");
+            if (resultsTable) {
+                resultsTable.innerHTML = data; 
+            } else {
+                console.error("Element with ID 'resultsTable' not found!");
+            }
+        })
+        .catch(error => console.error("Error:", error));
+    });
+});
+
 </script>
 </html>

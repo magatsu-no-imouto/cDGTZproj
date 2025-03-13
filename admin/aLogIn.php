@@ -15,7 +15,9 @@ if($row=mysqli_fetch_assoc($auth)){
     if($row['aPass']==$pass){
         echo "<br>welcome dood.<br>";
         $_SESSION['loggedin']=true;
-        header("Location: /dgcentre/admin/aHub.php");
+        echo "<script>
+            window.location.href = '/dgcentre/admin/';
+        </script>";
         exit;
     }else{
         echo "<script>
